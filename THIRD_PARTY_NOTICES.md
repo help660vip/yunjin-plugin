@@ -1,14 +1,13 @@
-# Third-party notices
+﻿# Third-party notices
 
-YunJin Plugin v1.0.0 is a clean-room implementation. This release does not
-copy source code, regular expressions, documentation, tests, images, fonts,
-templates, or other assets from the locally inspected reference repositories.
+YunJin Plugin does not bundle or copy source code, binary assets, fonts, fixtures, or private data from reference repositories. The implementation uses Node.js standard APIs and Yunzai runtime interfaces.
 
-The reference repositories were used only to understand publicly observable
-feature boundaries and to define independent behavior contracts. Their names,
-source mappings, internal audit notes, and local paths are intentionally not
-included in the distributed package.
+Optional public services are used only when their command is invoked:
 
-The runtime integration targets the public plugin conventions of TRSS-Yunzai
-and Miao-Yunzai. Those host applications remain separate software with their
-own licenses and are not bundled by this package.
+- Open-Meteo for weather queries.
+- Wikipedia REST API for encyclopedia summaries.
+- Frankfurter for exchange-rate queries.
+- QR Server URL format for QR image fallback.
+- Public search providers for image and music search links.
+
+External services are optional. Requests use shared timeout, response-size, protocol, private-network and redirect protections. Their own terms and privacy policies apply.

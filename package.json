@@ -1,6 +1,6 @@
 {
   "name": "yunjin-plugin",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "面向 TRSS-Yunzai 与 Miao-Yunzai 的模块化群聊综合助手",
   "type": "module",
   "main": "index.js",

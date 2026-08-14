@@ -1,7 +1,65 @@
-import configManifest from './core/08-config/manifest.js';
+const raw = [
+ ['01','status-card','core','status','\u72b6\u6001','user'],
+ ['02','error-report','core','error','\u62a5\u9519','user'],
+ ['03','log-archive','core','logs','\u65e5\u5fd7','admin'],
+ ['04','transaction','core','transaction','\u4e8b\u52a1','user'],
+ ['05','uptime-monitor','core','monitor','\u76d1\u63a7','admin'],
+ ['06','scheduler-center','core','schedule','\u8c03\u5ea6','admin'],
+ ['07','help-management','core','help','\u5e2e\u52a9','user'],
+ ['08','config-center','core','config','\u914d\u7f6e','user'],
+ ['09','access-control','governance','permission','\u6743\u9650','admin'],
+ ['10','namelist','governance','namelist','\u540d\u5355','admin'],
+ ['11','group-management','governance','group','\u7fa4\u7ba1','admin'],
+ ['12','event-monitor','governance','event','\u4e8b\u4ef6','admin'],
+ ['13','auto-enter-group','governance','join','\u5165\u7fa4','master'],
+ ['14','add-friends','governance','friend','\u597d\u53cb','master'],
+ ['15','word-filter','governance','filter','\u810f\u8bcd','admin'],
+ ['16','anti-ad','governance','antiad','\u53cd\u5e7f\u544a','admin'],
+ ['17','batch-withdrawal','governance','withdraw','\u64a4\u56de','admin'],
+ ['18','subscription-center','feeds','subscribe','\u8ba2\u9605','user'],
+ ['19','rss-subscription','feeds','rss','RSS','user'],
+ ['20','bili-chat','feeds','bili','\u54d4\u54e9','user'],
+ ['21','scheduled-broadcast','feeds','broadcast','\u5b9a\u65f6\u5e7f\u64ad','admin'],
+ ['22','report','feeds','report','\u62a5\u544a','admin'],
+ ['23','push','feeds','push','\u63a8\u9001','user'],
+ ['24','multi-source-daily','feeds','daily','\u65e5\u62a5','user'],
+ ['25','git-poller','feeds','poll','\u66f4\u65b0','admin'],
+ ['26','weather','feeds','weather','\u5929\u6c14','user'],
+ ['27','translator','tools','translate','\u7ffb\u8bd1','user'],
+ ['28','picsearcher','tools','picsearch','\u641c\u56fe','user'],
+ ['29','qrcode','tools','qrcode','\u4e8c\u7ef4\u7801','user'],
+ ['30','qrrender','tools','qrrender','\u4e8c\u7ef4\u7801\u6e32\u67d3','user'],
+ ['31','shorturl','tools','shorturl','\u77ed\u94fe','user'],
+ ['32','wiki','tools','wiki','\u767e\u79d1','user'],
+ ['33','exchange-rate','tools','rate','\u6c47\u7387','user'],
+ ['34','todo-nlp','tools','todo','\u5f85\u529e','user'],
+ ['35','clock','tools','clock','\u65f6\u949f','user'],
+ ['36','parser','media','parse','\u89e3\u6790','user'],
+ ['37','song-picker','media','song','\u70b9\u6b4c','user'],
+ ['38','memes','media','meme','\u8868\u60c5','user'],
+ ['39','save-pic','media','savepic','\u6536\u56fe','user'],
+ ['40','record','media','record','\u8bed\u97f3','user'],
+ ['41','autoreply','media','autoreply','\u81ea\u52a8\u56de\u590d','admin'],
+ ['42','word-bank','media','wordbank','\u8bcd\u5e93','user'],
+ ['43','group-summary','media','summary','\u603b\u7ed3','user'],
+ ['44','daily-sign','community','sign','\u7b7e\u5230','user'],
+ ['45','quote','community','quote','\u8bed\u5f55','user'],
+ ['46','essence-message','community','essence','\u7cbe\u534e','admin'],
+ ['47','group-heat','community','heat','\u7fa4\u6d3b\u8dc3','user'],
+ ['48','group-historian','community','history','\u7fa4\u5386\u53f2','user'],
+ ['49','lottery-signup','community','signup','\u62a5\u540d','user'],
+ ['50','daily-task','community','task','\u65e5\u4efb\u52a1','user']
+];
 
-export const featureManifests = Object.freeze([configManifest]);
+export const featureManifests = Object.freeze(raw.map(([id, slug, area, key, command, access]) => Object.freeze({
+  id, slug, area, key, command, access, name: slug,
+  enabledByDefault: true,
+  dependencies: [],
+  permissions: [`yunjin.${access}.${key}`],
+  commands: [`#\u4e91\u9526${command}`],
+  configSchema: { [`feature.${id}.enabled`]: { type: 'boolean', default: true, description: `Enable ${slug}` } }
+})));
 
 export function getFeatureManifest(id) {
-  return featureManifests.find((manifest) => manifest.id === id);
+  return featureManifests.find((manifest) => manifest.id === String(id).padStart(2, '0'));
 }
