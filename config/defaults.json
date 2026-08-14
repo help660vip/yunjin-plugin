@@ -1,0 +1,6 @@
+{
+  "core.enabled": true,
+  "core.hot_reload": true,
+  "core.reply_mode": "auto",
+  "core.audit_retention_days": 30
+}

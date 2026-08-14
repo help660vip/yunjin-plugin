@@ -1,0 +1,32 @@
+{
+  "name": "yunjin-plugin",
+  "version": "1.0.0",
+  "description": "面向 TRSS-Yunzai 与 Miao-Yunzai 的模块化群聊综合助手",
+  "type": "module",
+  "main": "index.js",
+  "exports": "./index.js",
+  "license": "MIT",
+  "author": "help660vip",
+  "engines": {
+    "node": ">=18.18.0"
+  },
+  "files": [
+    "index.js",
+    "apps",
+    "lib",
+    "config",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "scripts": {
+    "lint": "node --test test/lint.test.js",
+    "test": "node --test test/unit/*.test.js",
+    "test:compat:trss": "node --test test/compat/trss.test.js",
+    "test:compat:miao": "node --test test/compat/miao.test.js",
+    "test:render": "node --test test/render/*.test.js",
+    "test:smoke": "node --test test/smoke.test.js",
+    "pack:dry-run": "npm pack --dry-run"
+  }
+}

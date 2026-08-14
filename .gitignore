@@ -1,0 +1,10 @@
+node_modules/
+.workstate/
+data/
+temp/
+coverage/
+*.log
+*.tmp
+.env
+.env.*
+!.env.example
