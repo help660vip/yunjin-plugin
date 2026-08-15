@@ -439,3 +439,14 @@ test('anti-ad rules validate safe content and scoped actions', async () => {
   assert.match(await dispatchFeature(manifest,event,['unknown'],runtime),/\u0023\u4e91\u9526/)
   assert.match(await dispatchFeature(manifest,{...event,groupId:'private'},[],runtime),/\u53ea\u80fd\u5728\u7fa4\u804a/)
 })
+test('withdraw action isolates confirmation and duplicate ids', async () => {
+  const manifest=featureManifests.find(item => item.id==='17')
+  const runtime=runtimeWithState()
+  const calls=[]
+  const event={botId:'bot',groupId:'g1',userId:'u1',role:'admin',isMaster:false,bot:{deleteMsg:async id=>{calls.push(id)}}}
+  assert.match(await dispatchFeature(manifest,event,['123','123','\u786e\u8ba4'],runtime),/\u64a4\u56de\u5904\u7406\u5b8c\u6210/)
+  assert.deepEqual(calls,['123'])
+  assert.match(await dispatchFeature(manifest,event,['123','bad id','\u786e\u8ba4'],runtime),/\u0023\u4e91\u9526/)
+  assert.match(await dispatchFeature(manifest,event,['123'],runtime),/\u0023\u4e91\u9526/)
+  assert.match(await dispatchFeature(manifest,{...event,groupId:'private'},['123','\u786e\u8ba4'],runtime),/\u53ea\u80fd\u5728\u7fa4\u804a/)
+})
