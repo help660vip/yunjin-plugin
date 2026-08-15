@@ -1,0 +1,37 @@
+name: YunJin CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [18.18, 20, 22]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: \${{ matrix.node }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm test
+      - run: pnpm run test:features
+      - run: pnpm run test:compat:trss
+      - run: pnpm run test:compat:miao
+      - run: pnpm run test:render
+      - run: pnpm run test:smoke
+      - run: pnpm run state:check
+      - run: pnpm pack --dry-run

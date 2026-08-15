@@ -1,7 +1,7 @@
 {
   "name": "yunjin-plugin",
-  "version": "1.0.1",
-  "description": "面向 TRSS-Yunzai 与 Miao-Yunzai 的模块化群聊综合助手",
+  "version": "1.0.2",
+  "description": "Modular plugin for TRSS-Yunzai and Miao-Yunzai with group management, feeds, tools, media, and community features.",
   "type": "module",
   "main": "index.js",
   "exports": "./index.js",
@@ -15,6 +15,7 @@
     "apps",
     "lib",
     "config",
+    "scripts",
     "README.md",
     "CHANGELOG.md",
     "LICENSE",
@@ -23,10 +24,13 @@
   "scripts": {
     "lint": "node --test test/lint.test.js",
     "test": "node --test test/unit/*.test.js",
+    "test:features": "node --test test/feature-contract/*.test.js",
     "test:compat:trss": "node --test test/compat/trss.test.js",
     "test:compat:miao": "node --test test/compat/miao.test.js",
     "test:render": "node --test test/render/*.test.js",
     "test:smoke": "node --test test/smoke.test.js",
-    "pack:dry-run": "npm pack --dry-run"
+    "pack:dry-run": "npm pack --dry-run",
+    "state:check": "node scripts/state-check.mjs",
+    "audit:references": "node scripts/audit-references.mjs"
   }
 }
