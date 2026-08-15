@@ -1,7 +1,7 @@
 ﻿import test from 'node:test';
 import assert from 'node:assert/strict';
 import { apps, featureManifests, getRuntime, shutdownRuntime } from '../../index.js';
-import { canUseFeature, canWriteConfig } from '../../lib/auth/policy.js';
+import { canReadConfig, canUseFeature, canWriteConfig } from '../../lib/auth/policy.js';
 import { FeatureRegistry } from '../../lib/registry/feature-registry.js';
 import { makeTempDir } from '../helpers.js';
 
@@ -50,4 +50,19 @@ test('能力注册表输出稳定且不暴露内部数组', () => {
   assert.deepEqual(list.map((item) => item.id), ['01', '10']);
   list[0].name = '已修改';
   assert.notEqual(registry.get('01').name, '已修改');
+});
+
+
+test('OP 主人标记兼容并拒绝假值', () => {
+  const booleanOwner = { isMaster: true };
+  const stringOwner = { isMaster: 'true' };
+  const numericOwner = { isMaster: 1 };
+  const falseOwner = { isMaster: 'false' };
+  assert.equal(canUseFeature(booleanOwner, { access: 'master' }), true);
+  assert.equal(canUseFeature(stringOwner, { access: 'master' }), true);
+  assert.equal(canUseFeature(numericOwner, { access: 'master' }), true);
+  assert.equal(canUseFeature(falseOwner, { access: 'master' }), false);
+  assert.equal(canReadConfig(falseOwner), false);
+  assert.equal(canWriteConfig({ ...stringOwner }, { name: '全局' }), true);
+  assert.equal(canWriteConfig({ isMaster: 'false', userId: 'u1' }, { name: '全局' }), false);
 });
