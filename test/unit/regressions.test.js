@@ -31,6 +31,19 @@ test('runtime dispatch uses the concrete handler set', async () => {
   assert.match(result, /YunJin 运行状态/u);
 });
 
+test('status card reports scheduler, notification, and render health', async () => {
+  const runtime = runtimeWithState();
+  runtime.scheduler = { list: async () => [{ status: 'scheduled' }, { status: 'done' }] };
+  runtime.notifications = { snapshot: () => ({ queue: [{ id: 'a' }, { id: 'b' }], topics: ['task.execute'] }) };
+  runtime.capabilities = () => ({ render: true, message: { reply: true, send: true } });
+  const manifest = featureManifests.find((item) => item.id === '01');
+  const result = await dispatchFeature(manifest, { botId: 'b', groupId: 'g', userId: 'u' }, [], runtime);
+  assert.match(result, /\u8c03\u5ea6\u4efb\u52a1\uFF1A1\/2/u);
+  assert.match(result, /\u901a\u77e5\u961f\u5217\uFF1A2 \/ 1 topics/u);
+  assert.match(result, /\u6e32\u67d3\uFF1A\u53EF\u7528/u);
+  assert.match(result, /\u6d88\u606f\u9002\u914d\uFF1A2/u);
+});
+
 test('generated service failures are readable and healthCheck does not recurse', () => {
   const service = serviceFor('01');
   assert.equal(service.failure('invalid'), '参数不合法');

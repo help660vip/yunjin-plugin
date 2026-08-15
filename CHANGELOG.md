@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.8 - 2026-08-15
+
+### Added
+
+- Enhanced #云锦状态 with scheduler, notification queue, host capability, and renderer health summaries while retaining text fallback.
+
 ## 1.0.7 - 2026-08-15
 
 ### Fixed

@@ -19,6 +19,8 @@
 
 `#云锦状态`、`#云锦报错`、`#云锦日志`、`#云锦事务`、`#云锦监控`、`#云锦调度`、`#云锦帮助`、`#云锦配置`
 
+- `#云锦状态` displays runtime, scheduler, notification, and renderer health with text fallback when host capabilities are unavailable.
+
 ### 权限与群治理
 
 `#云锦权限`、`#云锦名单`、`#云锦群管`、`#云锦事件`、`#云锦入群`、`#云锦好友`、`#云锦脏词`、`#云锦反广告`、`#云锦撤回`
