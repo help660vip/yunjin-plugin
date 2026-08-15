@@ -388,3 +388,12 @@ test('group settings enforce chat and argument boundaries', async () => {
   assert.match(await dispatchFeature(manifest,event,['unknown'],runtime),/\u0023\u4e91\u9526\u7fa4\u7ba1/)
   assert.match(await dispatchFeature(manifest,{...event,groupId:'private'},[],runtime),/\u53ea\u80fd\u5728\u7fa4\u804a/)
 })
+test('event monitor enforces group and clear action boundaries', async () => {
+  const manifest=featureManifests.find(item => item.id==='12')
+  const runtime=runtimeWithState()
+  const event={botId:'bot',groupId:'g1',userId:'u1',role:'admin',isMaster:false}
+  assert.match(await dispatchFeature(manifest,event,['\u6e05\u7406'],runtime),/\u6ca1\u6709\u53ef\u6e05\u7406/)
+  assert.match(await dispatchFeature(manifest,event,['\u6e05\u7406','extra'],runtime),/\u0023\u4e91\u9526\u4e8b\u4ef6/)
+  assert.match(await dispatchFeature(manifest,event,['unknown'],runtime),/\u0023\u4e91\u9526\u4e8b\u4ef6/)
+  assert.match(await dispatchFeature(manifest,{...event,groupId:'private'},[],runtime),/\u53ea\u80fd\u5728\u7fa4\u804a/)
+})
