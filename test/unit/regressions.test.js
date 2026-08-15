@@ -754,3 +754,17 @@ test('song picker validates bounded names and user scope', async () => {
   const other = await dispatchFeature(manifest, { ...event, userId: 'other' }, ['list'], runtime);
   assert.equal(other.includes('blue moon'), false);
 });
+
+test('meme generation validates bounded template and text fallback', async () => {
+  const runtime = runtimeWithState();
+  const manifest = featureManifests.find((item) => item.id === '38');
+  const event = { botId: 'b', groupId: 'g', userId: 'u' };
+  const generated = await dispatchFeature(manifest, event, ['generate', 'card', 'hello', 'world'], runtime);
+  assert.equal(generated.includes('hello world'), true);
+  const oversized = await dispatchFeature(manifest, event, ['generate', 'card', 'x'.repeat(801)], runtime);
+  assert.equal(oversized.length > 0, true);
+  const badTemplate = await dispatchFeature(manifest, event, ['generate', 'x'.repeat(65), 'text'], runtime);
+  assert.equal(badTemplate.length > 0, true);
+  const control = await dispatchFeature(manifest, event, ['generate', 'card', 'a' + String.fromCharCode(0) + 'b'], runtime);
+  assert.equal(control.length > 0, true);
+});
