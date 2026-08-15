@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.6 - 2026-08-15
+
+### Fixed
+
+- Repaired Linux CI matrix interpolation and removed the invalid frozen-lockfile assumption.
+- Added reproducible install, full feature, TRSS/Miao, render, smoke, and package checks.
+
 ## 1.0.5 - 2026-08-15
 
 - Added persistent push queue records and real notification retry handling for `#云锦推送`.
