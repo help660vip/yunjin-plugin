@@ -159,3 +159,11 @@
 
 - Added capability health, dependency, rendering, storage, privacy, and failure-policy metadata for all 50 commands.
 - Added TRSS-Yunzai and Miao-Yunzai compatibility adapters with text fallback when optional capabilities are unavailable.
+
+## v1.2.3
+
+- Hardened Bilibili subscriptions with strict arguments, HTTPS URL validation, scheduler fallback, duplicate task detection, rollback on task creation failure, cancellation accounting, and audit events.
+
+## v1.2.4
+
+- Packaging follow-up: the hardened Bilibili subscription implementation and its regression suite are delivered in this valid release after the prior tag was already public.

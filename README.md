@@ -114,3 +114,11 @@ The persisted queue is available through `#云锦推送`. Use `#云锦推送 重
 
 #云锦 RSS
 - RSS 订阅使用共享 URL 安全策略，调度任务创建失败会回滚订阅，读取失败保留可读错误。
+
+### v1.2.3
+
+- #云锦B站订阅 now validates UID and HTTPS space links, safely degrades without the scheduler, rolls back failed task creation, and audits subscription lifecycle operations.
+
+### v1.2.4
+
+- Bilibili subscription hardening is included in the current package and release chain.

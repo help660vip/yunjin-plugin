@@ -386,8 +386,7 @@ test('group settings enforce chat and argument boundaries', async () => {
   assert.match(await dispatchFeature(manifest,event,['\u8bbe\u7f6e','welcome','on'],runtime),/\u7fa4\u8bbe\u7f6e\u5df2\u66f4\u65b0/)
   assert.match(await dispatchFeature(manifest,event,['\u8bbe\u7f6e','welcome','on','extra'],runtime),/\u0023\u4e91\u9526\u7fa4\u7ba1/)
   assert.match(await dispatchFeature(manifest,event,['unknown'],runtime),/\u0023\u4e91\u9526\u7fa4\u7ba1/)
-  assert.match(await dispatchFeature(manifest,{...event,groupId:'private'},[],runtime),/\u53ea\u80fd\u5728\u7fa4\u804a/)
-})
+  assert.match(await dispatchFeature(manifest,{...event,groupId:'private'},[],runtime),/\u53ea\u80fd\u5728\u7fa4\u804a/)})
 test('event monitor enforces group and clear action boundaries', async () => {
   const manifest=featureManifests.find(item => item.id==='12')
   const runtime=runtimeWithState()
@@ -487,3 +486,38 @@ test('rss subscription validates url, scheduler rollback and actions', async () 
   assert.match(await dispatchFeature(manifest,event,['\u6dfb\u52a0','https://example.com/feed.xml'],unavailable),/\u8c03\u5ea6\u670d\u52a1\u4e0d\u53ef\u7528/)
   assert.match(await dispatchFeature(manifest,{...event,groupId:'private'},[],runtime),/\u53ea\u80fd\u5728\u7fa4\u804a/)
 })
+test('bilibili subscription validates uid, scheduler fallback and rollback', async () => {
+  const manifest = featureManifests.find(item => item.id === '20')
+  const event = { botId: 'bot', groupId: 'g1', userId: 'u1', role: 'admin', isMaster: false }
+  const tasks = []
+  const runtime = runtimeWithState()
+  runtime.scheduler = {
+    list: async () => tasks,
+    create: async (input) => {
+      const task = { id: 'bili-task', featureId: input.featureId, payload: input.payload, status: 'scheduled' }
+      tasks.push(task)
+      return task
+    },
+    cancel: async (id) => {
+      const item = tasks.find(task => task.id === id)
+      if (item) item.status = 'cancelled'
+      return Boolean(item)
+    }
+  }
+  assert.match(await dispatchFeature(manifest, event, ['\u6dfb\u52a0', '12345'], runtime), /B \u7ad9\u8ba2\u9605\u5df2\u6dfb\u52a0/)
+  assert.match(await dispatchFeature(manifest, event, ['\u6dfb\u52a0', 'https://space.bilibili.com/12345'], runtime), /\u8ba2\u9605\u5df2\u5b58\u5728/)
+  assert.match(await dispatchFeature(manifest, event, ['\u6dfb\u52a0', 'http://space.bilibili.com/12345'], runtime), /\u6709\u6548/)
+  assert.match(await dispatchFeature(manifest, event, ['\u5220\u9664', 'bili-1', 'extra'], runtime), /\u0023\u4e91\u9526/)
+  assert.match(await dispatchFeature(manifest, event, ['unknown'], runtime), /\u0023\u4e91\u9526/)
+  const unavailable = runtimeWithState()
+  assert.match(await dispatchFeature(manifest, event, ['\u6dfb\u52a0', '67890'], unavailable), /\u8c03\u5ea6\u5668\u4e0d\u53ef\u7528/)
+  const failed = runtimeWithState()
+  failed.scheduler = {
+    list: async () => [],
+    create: async () => { throw new Error('scheduler down') },
+    cancel: async () => false
+  }
+  assert.match(await dispatchFeature(manifest, event, ['\u6dfb\u52a0', '98765'], failed), /\u56de\u6eda/)
+  assert.match(await dispatchFeature(manifest, { ...event, groupId: 'private' }, [], runtime), /\u53ea\u80fd\u5728\u7fa4\u804a/)
+})
+
