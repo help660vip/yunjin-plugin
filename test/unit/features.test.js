@@ -2,6 +2,7 @@
 import assert from 'node:assert/strict';
 import { apps, featureManifests, getRuntime, shutdownRuntime } from '../../index.js';
 import { canUseFeature, canWriteConfig } from '../../lib/auth/policy.js';
+import { FeatureRegistry } from '../../lib/registry/feature-registry.js';
 import { makeTempDir } from '../helpers.js';
 
 test('all 50 capabilities have one unique #yun jin command', () => {
@@ -31,4 +32,22 @@ test('every feature plugin handles its primary command without network access', 
     assert.equal(replies.length, 1, `feature ${featureManifests[index].id} did not reply`);
   }
   await shutdownRuntime();
+});
+
+
+test('能力注册表拒绝重复和无效清单', () => {
+  const config = { getEffective: () => ({}) };
+  assert.throws(() => new FeatureRegistry([featureManifests[0], { ...featureManifests[0] }], config), /重复能力编号/);
+  assert.throws(() => new FeatureRegistry([{ ...featureManifests[0], id: 'x' }], config), /能力清单编号无效/);
+  assert.throws(() => new FeatureRegistry([{ ...featureManifests[0], commands: [] }], config), /命令列表为空/);
+  assert.throws(() => new FeatureRegistry([featureManifests[0], { ...featureManifests[0], id: '51', command: featureManifests[0].command }], config), /\u91cd\u590d\u80fd\u529b\u547d\u4ee4/);
+});
+
+test('能力注册表输出稳定且不暴露内部数组', () => {
+  const config = { getEffective: () => ({}) };
+  const registry = new FeatureRegistry([featureManifests[9], featureManifests[0]], config);
+  const list = registry.list();
+  assert.deepEqual(list.map((item) => item.id), ['01', '10']);
+  list[0].name = '已修改';
+  assert.notEqual(registry.get('01').name, '已修改');
 });
