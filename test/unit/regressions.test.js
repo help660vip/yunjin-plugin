@@ -282,3 +282,21 @@ test('transaction updates are atomic and terminal operations are idempotent', as
   const usage = await dispatchFeature(manifest, event, ['\u672a\u77e5', 'extra'], runtime);
   assert.ok(usage.includes('\u5f00\u59cb'));
 });
+
+test('monitor add preserves IDs and rolls back scheduler failures', async () => {
+  const runtime = runtimeWithState();
+  runtime.scheduler = { tasks: [], async list() { return this.tasks; }, async create(payload) { const task = { ...payload, id: 'task-' + (this.tasks.length + 1), status: 'scheduled' }; this.tasks.push(task); return task; }, async cancel() { return true; } };
+  const manifest = featureManifests.find((item) => item.id === '05');
+  const event = { botId: 'b', groupId: 'g', userId: 'u' };
+  const first = await dispatchFeature(manifest, event, ['\u6dfb\u52a0', 'https://example.com'], runtime);
+  const second = await dispatchFeature(manifest, event, ['\u6dfb\u52a0', 'https://example.com/'], runtime);
+  assert.match(first, /\u76d1\u63a7\u5df2\u6dfb\u52a0/u);
+  assert.match(second, /\u76d1\u63a7\u5df2\u5b58\u5728|\u76d1\u63a7\u5df2\u6062\u590d/u);
+  const { featureStore } = await import('../../lib/features/store.js');
+  assert.equal((await featureStore(runtime, '05', event).list('items')).length, 1);
+  assert.equal(runtime.scheduler.tasks.length, 1);
+  const failing = runtimeWithState();
+  failing.scheduler = { async list() { return []; }, async create() { throw new Error('scheduler unavailable'); } };
+  await assert.rejects(() => dispatchFeature(manifest, event, ['\u6dfb\u52a0', 'https://example.org'], failing));
+  assert.equal((await featureStore(failing, '05', event).list('items')).length, 0);
+});
