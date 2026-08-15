@@ -612,4 +612,15 @@ test('weather lookup bounds city input and dependency failures', async () => {
   assert.match(await dispatchFeature(manifest, event, ['a'.repeat(65)], runtime), /\u0023\u4e91\u9526/)
   assert.match(await dispatchFeature(manifest, event, ['\u5317\u4eac'], runtime), /\u5929\u6c14\u670d\u52a1\u4e0d\u53ef\u7528|\u672a\u627e\u5230\u57ce\u5e02|[\u6e29\u6e7f]\u5ea6/)
 })
+test('translation validates input and provider fallback', async () => {
+  const manifest = featureManifests.find(item => item.id === '27')
+  const runtime = runtimeWithState()
+  const event = { botId: 'bot', groupId: 'g1', userId: 'u1', role: 'member', isMaster: false }
+  assert.match(await dispatchFeature(manifest, event, ['hello from yunjin'], runtime), /\u672a\u914d\u7f6e|\u8bd1\u6587/)
+  assert.match(await dispatchFeature(manifest, event, ['a'.repeat(1001)], runtime), /\u0023\u4e91\u9526|argument exceeds limit/)
+  const providerRuntime = runtimeWithState()
+  providerRuntime.config = { getGlobal: () => 'local' }
+  providerRuntime.providers = { query: async () => { throw new Error('provider down') } }
+  assert.match(await dispatchFeature(manifest, event, ['hello from yunjin'], providerRuntime), /\u7ffb\u8bd1\u670d\u52a1\u4e0d\u53ef\u7528/)
+})
 

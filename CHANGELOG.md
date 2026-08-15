@@ -191,3 +191,7 @@
 ## v1.3.0
 
 - Hardened weather lookup with bounded city input, dependency-safe error handling, not-found auditing, weather-code output, and renderer-compatible text fallback.
+
+## v1.3.1
+
+- Hardened translation with bounded input, local and provider fallback paths, provider exception isolation, result truncation, and audit coverage.

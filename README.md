@@ -146,3 +146,7 @@ The persisted queue is available through `#云锦推送`. Use `#云锦推送 重
 ### v1.3.0
 
 - #云锦 weather lookup now has bounded input and readable network fallbacks.
+
+### v1.3.1
+
+- #云锦 translation now degrades safely when no online provider is configured.
