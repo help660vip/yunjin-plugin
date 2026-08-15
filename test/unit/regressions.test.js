@@ -428,3 +428,14 @@ test('word filter validates group rules and deletion boundaries', async () => {
   assert.match(await dispatchFeature(manifest,event,['unknown'],runtime),/\u0023\u4e91\u9526/)
   assert.match(await dispatchFeature(manifest,{...event,groupId:'private'},[],runtime),/\u53ea\u80fd\u5728\u7fa4\u804a/)
 })
+test('anti-ad rules validate safe content and scoped actions', async () => {
+  const manifest=featureManifests.find(item => item.id==='16')
+  const runtime=runtimeWithState()
+  const event={botId:'bot',groupId:'g1',userId:'u1',role:'admin',isMaster:false}
+  assert.match(await dispatchFeature(manifest,event,['\u6dfb\u52a0','spam.example'],runtime),/\u5e7f\u544a\u89c4\u5219\u5df2\u6dfb\u52a0/)
+  assert.match(await dispatchFeature(manifest,event,['\u5220\u9664','spam.example'],runtime),/\u5e7f\u544a\u89c4\u5219\u5df2\u5220\u9664/)
+  assert.match(await dispatchFeature(manifest,event,['\u6dfb\u52a0','javascript:alert(1)'],runtime),/\u0023\u4e91\u9526/)
+  assert.match(await dispatchFeature(manifest,event,['\u6dfb\u52a0'],runtime),/\u0023\u4e91\u9526/)
+  assert.match(await dispatchFeature(manifest,event,['unknown'],runtime),/\u0023\u4e91\u9526/)
+  assert.match(await dispatchFeature(manifest,{...event,groupId:'private'},[],runtime),/\u53ea\u80fd\u5728\u7fa4\u804a/)
+})
