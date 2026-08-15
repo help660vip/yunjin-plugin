@@ -379,3 +379,12 @@ test('namelist actions validate type, identity and deletion audit boundaries', a
   assert.match(await dispatchFeature(manifest,event,['\u5217\u8868','extra'],runtime),/\u0023\u4e91\u9526\u540d\u5355/)
   assert.match(await dispatchFeature(manifest,event,['unknown'],runtime),/\u0023\u4e91\u9526\u540d\u5355/)
 })
+test('group settings enforce chat and argument boundaries', async () => {
+  const manifest=featureManifests.find(item => item.id==='11')
+  const runtime=runtimeWithState()
+  const event={botId:'bot',groupId:'g1',userId:'u1',role:'admin',isMaster:false}
+  assert.match(await dispatchFeature(manifest,event,['\u8bbe\u7f6e','welcome','on'],runtime),/\u7fa4\u8bbe\u7f6e\u5df2\u66f4\u65b0/)
+  assert.match(await dispatchFeature(manifest,event,['\u8bbe\u7f6e','welcome','on','extra'],runtime),/\u0023\u4e91\u9526\u7fa4\u7ba1/)
+  assert.match(await dispatchFeature(manifest,event,['unknown'],runtime),/\u0023\u4e91\u9526\u7fa4\u7ba1/)
+  assert.match(await dispatchFeature(manifest,{...event,groupId:'private'},[],runtime),/\u53ea\u80fd\u5728\u7fa4\u804a/)
+})

@@ -99,3 +99,6 @@ Matching OneBot/Yunzai request events are approved through `BotAdapter`. Missing
 ### Push delivery
 
 The persisted queue is available through `#云锦推送`. Use `#云锦推送 重试 <ID>` to retry a failed scheduled notification. Queue records are isolated by bot and target scope; unsupported delivery capabilities remain explicit failures.
+
+#云锦群管理
+- 群管理设置只在群聊生效，严格校验键、值和多余参数。
