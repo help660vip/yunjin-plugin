@@ -520,4 +520,33 @@ test('bilibili subscription validates uid, scheduler fallback and rollback', asy
   assert.match(await dispatchFeature(manifest, event, ['\u6dfb\u52a0', '98765'], failed), /\u56de\u6eda/)
   assert.match(await dispatchFeature(manifest, { ...event, groupId: 'private' }, [], runtime), /\u53ea\u80fd\u5728\u7fa4\u804a/)
 })
+test('broadcast scheduler validates scope, arguments and dependency fallback', async () => {
+  const manifest = featureManifests.find(item => item.id === '21')
+  const event = { botId: 'bot', groupId: 'g1', userId: 'u1', role: 'admin', isMaster: false }
+  const tasks = []
+  const runtime = runtimeWithState()
+  runtime.scheduler = {
+    list: async () => tasks,
+    find: async (id) => tasks.find(task => task.id === id),
+    create: async (input) => {
+      const task = { id: 'broadcast-task', featureId: input.featureId, groupId: input.groupId, userId: input.userId, payload: input.payload, status: 'scheduled', runAt: Date.now() }
+      tasks.push(task)
+      return task
+    },
+    cancel: async (id) => {
+      const task = tasks.find(item => item.id === id)
+      if (task) task.status = 'cancelled'
+      return Boolean(task)
+    }
+  }
+  assert.match(await dispatchFeature(manifest, event, [], runtime), /\u6682\u65e0\u5e7f\u64ad\u4efb\u52a1/)
+  assert.match(await dispatchFeature(manifest, event, ['1m', '\u6d4b\u8bd5\u5e7f\u64ad'], runtime), /\u5e7f\u64ad\u4efb\u52a1\u5df2\u521b\u5efa/)
+  assert.match(await dispatchFeature(manifest, event, ['\u53d6\u6d88', 'broadcast-task', 'extra'], runtime), /\u0023\u4e91\u9526/)
+  assert.match(await dispatchFeature(manifest, { ...event, userId: 'u2', role: 'member' }, ['\u53d6\u6d88', 'broadcast-task'], runtime), /\u672a\u627e\u5230/)
+  assert.match(await dispatchFeature(manifest, event, ['\u53d6\u6d88', 'broadcast-task'], runtime), /\u5df2\u53d6\u6d88/)
+  assert.match(await dispatchFeature(manifest, event, ['bad', '\u6d4b\u8bd5'], runtime), /\u0023\u4e91\u9526/)
+  const unavailable = runtimeWithState()
+  assert.match(await dispatchFeature(manifest, event, [], unavailable), /\u8c03\u5ea6\u670d\u52a1\u4e0d\u53ef\u7528/)
+  assert.match(await dispatchFeature(manifest, { ...event, groupId: 'private' }, [], runtime), /\u53ea\u80fd\u5728\u7fa4\u804a/)
+})
 

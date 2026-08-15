@@ -167,3 +167,7 @@
 ## v1.2.4
 
 - Packaging follow-up: the hardened Bilibili subscription implementation and its regression suite are delivered in this valid release after the prior tag was already public.
+
+## v1.2.5
+
+- Hardened scheduled broadcasts with explicit group isolation, scoped cancellation, strict action arguments, bounded content, dependency fallback, failure audits, and regression coverage.

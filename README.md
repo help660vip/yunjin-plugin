@@ -122,3 +122,7 @@ The persisted queue is available through `#云锦推送`. Use `#云锦推送 重
 ### v1.2.4
 
 - Bilibili subscription hardening is included in the current package and release chain.
+
+### v1.2.5
+
+- #云锦 broadcast tasks now enforce group scope and safe scheduling fallbacks.
