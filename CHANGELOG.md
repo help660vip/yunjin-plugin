@@ -179,3 +179,7 @@
 ## v1.2.7
 
 - Hardened push retries with strict actions, group isolation, a bounded retry count, notification fallback, state-save error handling, and audit coverage.
+
+## v1.2.8
+
+- Hardened information sources with strict actions, SSRF-safe URL handling, bounded title extraction, refresh failure isolation, network fallback, and audit coverage.

@@ -568,4 +568,14 @@ test('push retry validates scope, limits and dependency fallback', async () => {
   assert.match(await dispatchFeature(manifest, event, ['unknown'], runtime), /\u0023\u4e91\u9526/)
   assert.match(await dispatchFeature(manifest, { ...event, groupId: 'private' }, [], runtime), /\u53ea\u80fd\u5728\u7fa4\u804a/)
 })
+test('information sources validate actions and network fallback', async () => {
+  const manifest = featureManifests.find(item => item.id === '24')
+  const runtime = runtimeWithState()
+  const event = { botId: 'bot', groupId: 'g1', userId: 'u1', role: 'member', isMaster: false }
+  assert.match(await dispatchFeature(manifest, event, [], runtime), /\u6682\u65e0\u8bb0\u5f55|\u6682\u65e0\u4fe1\u606f\u6e90/)
+  assert.match(await dispatchFeature(manifest, event, ['\u6dfb\u52a0', 'https://example.com'], runtime), /\u4fe1\u606f\u6e90\u5df2\u6dfb\u52a0/)
+  assert.match(await dispatchFeature(manifest, event, ['\u6dfb\u52a0', 'https://example.com', 'extra'], runtime), /\u0023\u4e91\u9526/)
+  assert.match(await dispatchFeature(manifest, event, ['unknown'], runtime), /\u0023\u4e91\u9526/)
+  assert.match(await dispatchFeature(manifest, event, ['\u5237\u65b0', 'extra'], runtime), /\u0023\u4e91\u9526/)
+})
 
