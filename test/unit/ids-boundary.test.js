@@ -22,7 +22,7 @@ test(chars(20316, 29992, 22495, 22478, 21644, 31283, 30028, 26377, 30028, 36793,
   assert.equal(scopeKey(event, null), 'bot:default:user:unknown');
 });
 
-test(chars(31283, 23450) + ' ID' + chars(21644, 33073, 25935, 23433, 20840), () => {
+test(chars(31283, 23450, 20540, 21644, 33073, 25935, 23433, 20840), () => {
   assert.equal(stableId([{ bad: true }], Number.NaN).length, 24);
   assert.equal(stableId('value', Number.POSITIVE_INFINITY).length, 24);
   assert.equal(stableId('value', 3).length, 8);
