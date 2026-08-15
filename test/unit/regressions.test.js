@@ -737,3 +737,20 @@ test('url parser validates safe URLs and bounded input', async () => {
   const control = await dispatchFeature(manifest, event, ['https://example.com/a' + String.fromCharCode(0) + 'b'], runtime);
   assert.equal(control.length > 0, true);
 });
+
+test('song picker validates bounded names and user scope', async () => {
+  const runtime = runtimeWithState();
+  const manifest = featureManifests.find((item) => item.id === '37');
+  const event = { botId: 'b', groupId: 'g', userId: 'u' };
+  const oversized = await dispatchFeature(manifest, event, ['add', 'x'.repeat(201)], runtime);
+  assert.equal(oversized.length > 0, true);
+  const added = await dispatchFeature(manifest, event, ['add', 'blue moon'], runtime);
+  const itemId = added.split(String.fromCodePoint(65306)).pop().trim();
+  assert.equal(/^[0-9a-f-]{36}$/iu.test(itemId), true);
+  const listed = await dispatchFeature(manifest, event, ['list'], runtime);
+  assert.equal(listed.includes('blue moon'), true);
+  const random = await dispatchFeature(manifest, event, ['random'], runtime);
+  assert.equal(random.includes('blue moon'), true);
+  const other = await dispatchFeature(manifest, { ...event, userId: 'other' }, ['list'], runtime);
+  assert.equal(other.includes('blue moon'), false);
+});

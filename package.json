@@ -1,6 +1,6 @@
 {
   "name": "yunjin-plugin",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Modular plugin for TRSS-Yunzai and Miao-Yunzai with group management, feeds, tools, media, and community features.",
   "type": "module",
   "main": "index.js",
