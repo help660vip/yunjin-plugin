@@ -945,3 +945,16 @@ test('\u5e2e\u52a9\u8f93\u51fa\u4e0d\u53d7\u6ce8\u518c\u987a\u5e8f\u5f71\u54cd',
   const result = await dispatchFeature(manifest, event, [], runtime);
   assert.ok(result.indexOf('#\u4e91\u9526\u72b6\u6001') < result.indexOf('#\u4e91\u9526\u5e2e\u52a9'));
 });
+
+
+test('调度器新任务从 scheduled 开始并规范过期值', async () => {
+  const repository = new MemoryRepository({ tasks: [] });
+  const scheduler = new SchedulerService(repository, { clock: { now: () => 1000 }, onExecute: async () => {} });
+  const task = await scheduler.create({ featureId: '06', title: 'boundary', status: 'done', runAt: 900, maxAttempts: 2.9 });
+  assert.equal(task.status, 'scheduled');
+  assert.equal(task.runAt, 1000);
+  assert.equal(task.maxAttempts, 2);
+  assert.equal(await scheduler.execute(task.id), true);
+  assert.equal((await scheduler.find(task.id)).status, 'done');
+  await scheduler.close();
+});
