@@ -37,7 +37,7 @@ export function validateInput(input = []) {
 }
 
 export function scopeFor(event, level) {
-  return scopeKey(event, { level: level || (event?.groupId ? 'group' : 'user') });
+  return scopeKey(event, { level: level || (event?.groupId && event.groupId !== 'private' ? 'group' : 'user') });
 }
 
 export function identityFor(event) {

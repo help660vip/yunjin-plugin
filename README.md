@@ -48,6 +48,10 @@
 - `#云锦时钟 10 提醒内容`：创建十分钟提醒。
 - `#云锦报名 参加 周末活动`：参加报名活动。
 
+- `#云锦配置 设置 用户 feature.01.enabled true`; `设置 群 <群 ID> ...` targets the current group.
+- `#云锦监控 添加 https://example.com`; use `删除 <ID>` to remove it.
+- `#云锦哔哩 添加 <UID>` creates a Bilibili subscription; `#云锦更新 添加 <URL>` creates a Git poller.
+- All scheduled tasks and request approvals remain isolated by bot, group, and user scope.
 ## 运行与安全
 
 插件使用 JavaScript ESM。统一事件适配支持 `e.msg`、`e.raw_message`、消息段、私聊、群聊、bot 缺失和 `e.isMaster`。Redis、外部网络和渲染器均为可选能力，缺失时使用文件存储、错误文本或纯文本降级。
@@ -71,3 +75,16 @@ pnpm pack --dry-run
 ## 许可
 
 本项目采用 MIT License。实现遵循公开行为契约，不复制参考项目源代码、测试、图片、字体或私有数据。第三方服务和声明见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+
+### Request event adapters
+
+The command surface remains 50 unified `#云锦xx` commands. Two non-command event adapters are also exported for Yunzai request events:
+
+- `#云锦入群 添加 <group_id>` maintains the bot-scoped auto-enter allow list.
+- `#云锦好友 添加 <user_id>` maintains the bot-scoped friend-request allow list.
+
+Matching OneBot/Yunzai request events are approved through `BotAdapter`. Missing request flags, missing protocol methods, disabled features, storage failures, and non-matching IDs fail closed. Approval results are retained in the same bot-scoped feature state for audit and duplicate suppression.
+
+### Push delivery
+
+The persisted queue is available through `#云锦推送`. Use `#云锦推送 重试 <ID>` to retry a failed scheduled notification. Queue records are isolated by bot and target scope; unsupported delivery capabilities remain explicit failures.

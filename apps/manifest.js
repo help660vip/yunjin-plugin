@@ -6,7 +6,7 @@ const raw = [
  ['05','uptime-monitor','core','monitor','\u76d1\u63a7','admin'],
  ['06','scheduler-center','core','schedule','\u8c03\u5ea6','admin'],
  ['07','help-management','core','help','\u5e2e\u52a9','user'],
- ['08','config-center','core','config','\u914d\u7f6e','master'],
+ ['08','config-center','core','config','\u914d\u7f6e','user'],
  ['09','access-control','governance','permission','\u6743\u9650','admin'],
  ['10','namelist','governance','namelist','\u540d\u5355','admin'],
  ['11','group-management','governance','group','\u7fa4\u7ba1','admin'],

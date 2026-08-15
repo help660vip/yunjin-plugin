@@ -1,3 +1,29 @@
+# Changelog
+
+## 1.0.5 - 2026-08-15
+
+- Added persistent push queue records and real notification retry handling for `#云锦推送`.
+- Added strict request event type validation before auto-approval.
+- Added per-reference L0 clean-room third-party notices.
+
+- Added request-event adapters for the auto-enter-group and add-friends capabilities.
+- Added bot-scoped request approval records with flag deduplication and fail-closed protocol fallback.
+- Added normalized request metadata (`postType`, `requestType`, `subType`, `flag`, and `comment`).
+
+### Added
+
+- Added persistent passive collection for event, group summary, group heat, and group history views.
+- Added periodic URL monitoring, Bilibili subscriptions, and Git polling with task cleanup.
+
+### Fixed
+
+- Enforced bot/group/user task scope checks and private-chat storage isolation.
+- Made user and group configuration commands reachable while keeping global writes OP-only.
+- Added explicit confirmation for batch withdrawal and regression coverage for scheduler and telemetry behavior.
+
+- Added the shared renderer path for image, QR, and meme capabilities with text fallback.
+- Fixed rendered segment replies so host adapters receive message segments instead of serialized objects.
+
 ## 1.0.4 - 2026-08-15
 
 - Runtime commands now dispatch through the concrete 50-feature handler set.
@@ -5,8 +31,6 @@
 - Hardened configuration scope aliases, state sanitization, and Yunzai OP/current-scope permissions.
 - Enabled group members to join signup events while keeping event management admin-only.
 - Repaired generated service failure messages and health checks; added regression coverage.
-
-# Changelog
 
 ## 1.0.3 - 2026-08-15
 
