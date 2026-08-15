@@ -450,3 +450,22 @@ test('withdraw action isolates confirmation and duplicate ids', async () => {
   assert.match(await dispatchFeature(manifest,event,['123'],runtime),/\u0023\u4e91\u9526/)
   assert.match(await dispatchFeature(manifest,{...event,groupId:'private'},['123','\u786e\u8ba4'],runtime),/\u53ea\u80fd\u5728\u7fa4\u804a/)
 })
+test('subscription center validates targets, scheduler rollback and actions', async () => {
+  const manifest=featureManifests.find(item => item.id==='18')
+  const runtime=runtimeWithState()
+  const tasks=[]
+  let nextTask=1
+  runtime.scheduler={
+    list:async()=>tasks,
+    create:async(input)=>{const task={id:'task-'+nextTask++,featureId:input.featureId,payload:input.payload,status:'scheduled'};tasks.push(task);return task},
+    cancel:async(id)=>{const item=tasks.find(task=>task.id===id);if(item)item.status='cancelled';return Boolean(item)}
+  }
+  const event={botId:'bot',groupId:'g1',userId:'u1',role:'admin',isMaster:false}
+  assert.match(await dispatchFeature(manifest,event,['\u6dfb\u52a0','target','1m'],runtime),/\u8ba2\u9605\u5df2\u6dfb\u52a0/)
+  assert.match(await dispatchFeature(manifest,event,['\u6dfb\u52a0','target','1m'],runtime),/\u8ba2\u9605\u5df2\u5b58\u5728/)
+  assert.match(await dispatchFeature(manifest,event,['\u5220\u9664','bad','extra'],runtime),/\u0023\u4e91\u9526/)
+  assert.match(await dispatchFeature(manifest,event,['unknown'],runtime),/\u0023\u4e91\u9526/)
+  const unavailable=runtimeWithState()
+  assert.match(await dispatchFeature(manifest,event,['\u6dfb\u52a0','target'],unavailable),/\u8c03\u5ea6\u670d\u52a1\u4e0d\u53ef\u7528/)
+  assert.match(await dispatchFeature(manifest,{...event,groupId:'private'},[],runtime),/\u53ea\u80fd\u5728\u7fa4\u804a/)
+})
