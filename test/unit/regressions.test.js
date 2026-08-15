@@ -958,3 +958,25 @@ test('调度器新任务从 scheduled 开始并规范过期值', async () => {
   assert.equal((await scheduler.find(task.id)).status, 'done');
   await scheduler.close();
 });
+
+
+test('订阅 URL 规范化并去重', async () => {
+  const runtime = runtimeWithState();
+  const tasks = [];
+  runtime.scheduler = {
+    list: async () => tasks,
+    create: async (input) => { const task = { id: 'sub-' + (tasks.length + 1), status: 'scheduled', ...input }; tasks.push(task); return task; },
+    cancel: async () => true
+  };
+  const event = { botId: 'b', groupId: 'g1', userId: 'u1', role: 'admin', isMaster: false };
+  const generic = featureManifests.find((item) => item.id === '18');
+  const first = await dispatchFeature(generic, event, ['添加', 'https://EXAMPLE.com/'], runtime);
+  const duplicate = await dispatchFeature(generic, event, ['添加', 'https://example.com'], runtime);
+  assert.match(first, /订阅已添加/u);
+  assert.match(duplicate, /订阅已存在/u);
+  const rss = featureManifests.find((item) => item.id === '19');
+  const rssFirst = await dispatchFeature(rss, event, ['添加', 'https://EXAMPLE.com/'], runtime);
+  const rssDuplicate = await dispatchFeature(rss, event, ['添加', 'https://example.com'], runtime);
+  assert.match(rssFirst, /RSS 订阅已添加/u);
+  assert.match(rssDuplicate, /RSS \u8ba2\u9605\u5df2\u5b58\u5728/u);
+});
