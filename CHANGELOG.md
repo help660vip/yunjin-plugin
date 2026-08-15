@@ -207,3 +207,7 @@
 ## v1.3.4
 
 - Hardened QR rendering with bounded content, control-character rejection, shared QR URL handling, audit coverage, and text fallback when image rendering is unavailable.
+
+## v1.3.5
+
+- Hardened short links with strict resolve/create arguments, safe-code validation, URL rejection, collision avoidance, transactional persistence, and audit coverage.

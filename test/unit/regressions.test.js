@@ -647,4 +647,14 @@ test('qr render validates bounded content and renderer fallback', async () => {
   assert.match(String(result), /\u4e8c\u7ef4\u7801|render me|qrserver/)
   assert.match(await dispatchFeature(manifest, event, ['a'.repeat(2049)], runtime), /\u0023\u4e91\u9526|argument exceeds limit/)
 })
+test('shorturl validates actions, safe urls and resolve scope', async () => {
+  const manifest = featureManifests.find(item => item.id === '31')
+  const runtime = runtimeWithState()
+  const event = { botId: 'bot', groupId: 'g1', userId: 'u1', role: 'member', isMaster: false }
+  const result = await dispatchFeature(manifest, event, ['https://example.com/path'], runtime)
+  assert.match(String(result), /\u77ed\u94fe\u63a5|example\.com/)
+  assert.match(await dispatchFeature(manifest, event, ['\u89e3\u6790', 'bad', 'extra'], runtime), /\u0023\u4e91\u9526/)
+  assert.match(await dispatchFeature(manifest, event, ['\u751f\u6210', 'javascript:alert(1)'], runtime), /\u5b89\u5168|URL/)
+  assert.match(await dispatchFeature(manifest, event, ['a'.repeat(2049)], runtime), /\u0023\u4e91\u9526|argument exceeds limit/)
+})
 
