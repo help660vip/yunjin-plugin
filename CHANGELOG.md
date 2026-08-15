@@ -211,3 +211,7 @@
 ## v1.3.5
 
 - Hardened short links with strict resolve/create arguments, safe-code validation, URL rejection, collision avoidance, transactional persistence, and audit coverage.
+
+## v1.3.6
+
+- Hardened encyclopedia lookup with bounded query input, dependency-safe error handling, bounded source fields, cache-aware HTTP options, and audit coverage.

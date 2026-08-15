@@ -166,3 +166,7 @@ The persisted queue is available through `#云锦推送`. Use `#云锦推送 重
 ### v1.3.5
 
 - #云锦 short links now validate URLs and prevent short-code collisions.
+
+### v1.3.6
+
+- #云锦 encyclopedia lookup now has bounded queries and readable service fallbacks.

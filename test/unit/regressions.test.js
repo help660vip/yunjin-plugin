@@ -657,4 +657,11 @@ test('shorturl validates actions, safe urls and resolve scope', async () => {
   assert.match(await dispatchFeature(manifest, event, ['\u751f\u6210', 'javascript:alert(1)'], runtime), /\u5b89\u5168|URL/)
   assert.match(await dispatchFeature(manifest, event, ['a'.repeat(2049)], runtime), /\u0023\u4e91\u9526|argument exceeds limit/)
 })
+test('wiki lookup validates bounded query and dependency fallback', async () => {
+  const manifest = featureManifests.find(item => item.id === '32')
+  const runtime = runtimeWithState()
+  const event = { botId: 'bot', groupId: 'g1', userId: 'u1', role: 'member', isMaster: false }
+  assert.match(await dispatchFeature(manifest, event, ['a'.repeat(129)], runtime), /\u0023\u4e91\u9526|argument exceeds limit/)
+  assert.match(await dispatchFeature(manifest, event, ['\u4e91\u9526'], runtime), /\u767e\u79d1\u670d\u52a1\u4e0d\u53ef\u7528|\u6458\u8981|\u6682\u65e0\u6458\u8981/)
+})
 
