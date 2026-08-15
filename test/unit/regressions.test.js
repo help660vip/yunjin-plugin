@@ -802,3 +802,21 @@ test('media reference validates actions, bounds and user scope', async () => {
   const tooMany = await dispatchFeature(manifest, { ...event, segments: [] }, ['record', ...Array.from({ length: 11 }, (_, index) => 'https://example.com/' + index + '.mp3')], runtime);
   assert.equal(tooMany.length > 0, true);
 });
+
+test('autoreply validates rules, group scope and actions', async () => {
+  const runtime = runtimeWithState();
+  const manifest = featureManifests.find((item) => item.id === '41');
+  const event = { botId: 'b', groupId: 'g', userId: 'u', isAdmin: true };
+  const oversized = await dispatchFeature(manifest, event, ['add', 'hello', 'x'.repeat(1001)], runtime);
+  assert.equal(oversized.length > 0, true);
+  const added = await dispatchFeature(manifest, event, ['add', 'hello', 'world'], runtime);
+  assert.equal(added.length > 0, true);
+  const listed = await dispatchFeature(manifest, event, ['list'], runtime);
+  assert.equal(listed.includes('1. hello'), true);
+  const other = await dispatchFeature(manifest, { ...event, groupId: 'other' }, ['list'], runtime);
+  assert.equal(other.includes('hello'), false);
+  const deleted = await dispatchFeature(manifest, event, ['delete', 'hello'], runtime);
+  assert.equal(deleted.length > 0, true);
+  const empty = await dispatchFeature(manifest, event, ['list'], runtime);
+  assert.equal(empty.includes('hello'), false);
+});
