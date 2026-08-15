@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.7 - 2026-08-15
+
+### Fixed
+
+- Removed the npm cache requirement from Linux CI so the lockfile-free package installs reproducibly.
+
 ## 1.0.6 - 2026-08-15
 
 ### Fixed
