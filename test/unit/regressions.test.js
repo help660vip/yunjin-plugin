@@ -578,4 +578,31 @@ test('information sources validate actions and network fallback', async () => {
   assert.match(await dispatchFeature(manifest, event, ['unknown'], runtime), /\u0023\u4e91\u9526/)
   assert.match(await dispatchFeature(manifest, event, ['\u5237\u65b0', 'extra'], runtime), /\u0023\u4e91\u9526/)
 })
+test('git repository polling validates actions, scheduler fallback and rollback', async () => {
+  const manifest = featureManifests.find(item => item.id === '25')
+  const runtime = runtimeWithState()
+  const tasks = []
+  runtime.scheduler = {
+    list: async () => tasks,
+    create: async (input) => {
+      const task = { id: 'git-task', featureId: input.featureId, payload: input.payload, status: 'scheduled' }
+      tasks.push(task)
+      return task
+    },
+    cancel: async (id) => {
+      const task = tasks.find(item => item.id === id)
+      if (task) task.status = 'cancelled'
+      return Boolean(task)
+    }
+  }
+  const event = { botId: 'bot', groupId: 'g1', userId: 'u1', role: 'member', isMaster: false }
+  assert.match(await dispatchFeature(manifest, event, ['\u6dfb\u52a0', 'https://github.com/example/project'], runtime), /\u8f6e\u8be2\u76ee\u6807\u5df2\u6dfb\u52a0/)
+  assert.match(await dispatchFeature(manifest, event, ['\u6dfb\u52a0', 'https://github.com/example/project'], runtime), /\u8f6e\u8f6c\u5df2\u5b58\u5728|\u8f6e\u8be2\u5df2\u5b58\u5728/)
+  assert.match(await dispatchFeature(manifest, event, ['\u5220\u9664', 'bad', 'extra'], runtime), /\u0023\u4e91\u9526/)
+  assert.match(await dispatchFeature(manifest, event, ['\u68c0\u67e5', 'a', 'b'], runtime), /\u0023\u4e91\u9526/)
+  assert.match(await dispatchFeature(manifest, event, ['unknown'], runtime), /\u0023\u4e91\u9526/)
+  const unavailable = runtimeWithState()
+  assert.match(await dispatchFeature(manifest, event, ['\u6dfb\u52a0', 'https://github.com/example/other'], unavailable), /\u8c03\u5ea6\u670d\u52a1\u4e0d\u53ef\u7528/)
+  assert.match(await dispatchFeature(manifest, event, ['\u6dfb\u52a0', 'http://127.0.0.1/repo'], runtime), /\u4e0d\u5b89\u5168/)
+})
 

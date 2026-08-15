@@ -138,3 +138,7 @@ The persisted queue is available through `#云锦推送`. Use `#云锦推送 重
 ### v1.2.8
 
 - #云锦 information sources now use safe URL validation and readable refresh fallbacks.
+
+### v1.2.9
+
+- #云锦 Git polling now uses safe URL handling and transactional scheduler setup.

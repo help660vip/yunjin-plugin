@@ -183,3 +183,7 @@
 ## v1.2.8
 
 - Hardened information sources with strict actions, SSRF-safe URL handling, bounded title extraction, refresh failure isolation, network fallback, and audit coverage.
+
+## v1.2.9
+
+- Hardened Git repository polling with strict actions, URL policy handling, scheduler fallback, duplicate task detection, rollback on scheduler failure, cancellation accounting, and audited checks.
