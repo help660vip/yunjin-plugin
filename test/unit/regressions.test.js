@@ -623,4 +623,12 @@ test('translation validates input and provider fallback', async () => {
   providerRuntime.providers = { query: async () => { throw new Error('provider down') } }
   assert.match(await dispatchFeature(manifest, event, ['hello from yunjin'], providerRuntime), /\u7ffb\u8bd1\u670d\u52a1\u4e0d\u53ef\u7528/)
 })
+test('image search validates bounded query and safe encoding', async () => {
+  const manifest = featureManifests.find(item => item.id === '28')
+  const runtime = runtimeWithState()
+  const event = { botId: 'bot', groupId: 'g1', userId: 'u1', role: 'member', isMaster: false }
+  const result = await dispatchFeature(manifest, event, ['cats & dogs'], runtime)
+  assert.match(String(result), /cats|Bing|\u56fe\u7247\u641c\u7d22|\u914d\u989d\u4e0d\u8db3/)
+  assert.match(await dispatchFeature(manifest, event, ['a'.repeat(129)], runtime), /\u0023\u4e91\u9526|argument exceeds limit/)
+})
 

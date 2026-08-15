@@ -195,3 +195,7 @@
 ## v1.3.1
 
 - Hardened translation with bounded input, local and provider fallback paths, provider exception isolation, result truncation, and audit coverage.
+
+## v1.3.2
+
+- Hardened image search with bounded keywords, control-character rejection, quota failure fallback, safe query encoding, and audit coverage.

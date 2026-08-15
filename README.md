@@ -150,3 +150,7 @@ The persisted queue is available through `#云锦推送`. Use `#云锦推送 重
 ### v1.3.1
 
 - #云锦 translation now degrades safely when no online provider is configured.
+
+### v1.3.2
+
+- #云锦 image search now enforces bounded keywords and quota-safe fallback.
