@@ -8,7 +8,6 @@ const stateFile = path.join(root, '.workstate', 'state.json');
 const auditRoot = path.join(root, '.workstate', 'source-audit');
 const expectedRepository = 'https://github.com/help660vip/yunjin-plugin.git';
 const expectedBranch = 'main';
-const expectedVersion = '1.0.1';
 const expectedCount = 50;
 
 function fail(message, details = {}) {
@@ -62,6 +61,9 @@ async function validateState() {
   assert(await exists(stateFile), 'missing .workstate/state.json');
   assert(await exists(auditRoot), 'missing .workstate/source-audit');
   const state = await readJson(stateFile);
+  const packageJson = await readJson(path.join(root, 'package.json'));
+  const expectedVersion = packageJson.version;
+  assert(typeof expectedVersion === 'string' && /^\d+\.\d+\.\d+$/.test(expectedVersion), 'package version is invalid');
   assert(state.repository === expectedRepository, 'repository does not match the approved origin');
   assert(state.branch === expectedBranch, 'state branch is not main');
   assert(state.currentVersion === expectedVersion, 'state version is not the published package version');
