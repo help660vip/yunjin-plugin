@@ -250,3 +250,17 @@ test('report action merges repeated scoped errors', async () => {
   const states = Object.values(await runtime.stateRepository.read({}));
   assert.equal(states.length, 2);
 });
+
+test('log archive validates actions and reports clear count', async () => {
+  const runtime = runtimeWithState();
+  const manifest = featureManifests.find((item) => item.id === '03');
+  const event = { botId: 'b', groupId: 'g', userId: 'u' };
+  const { featureStore } = await import('../../lib/features/store.js');
+  await featureStore(runtime, '03', event).add({ text: 'startup warning' });
+  const usage = await dispatchFeature(manifest, event, ['unknown'], runtime);
+  assert.ok(usage.includes('\u67e5\u770b|\u6e05\u7406'));
+  const result = await dispatchFeature(manifest, event, ['\u6e05\u7406'], runtime);
+  assert.match(result, /1 \u6761\u65e5\u5fd7/u);
+  const empty = await dispatchFeature(manifest, event, ['\u6e05\u7406'], runtime);
+  assert.match(empty, /\u6ca1\u6709\u65e5\u5fd7/u);
+});
