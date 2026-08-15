@@ -723,3 +723,17 @@ test('clock validates timezone input and config fallback', async () => {
   const oversized = await dispatchFeature(manifest, event, ['x'.repeat(65)], runtime);
   assert.equal(oversized.length > 0, true);
 });
+
+test('url parser validates safe URLs and bounded input', async () => {
+  const runtime = runtimeWithState();
+  const manifest = featureManifests.find((item) => item.id === '36');
+  const event = { botId: 'b', groupId: 'g', userId: 'u' };
+  const valid = await dispatchFeature(manifest, event, ['https://example.com/path?a=1&b=2'], runtime);
+  assert.equal(valid.includes('example.com'), true);
+  const privateUrl = await dispatchFeature(manifest, event, ['http://127.0.0.1/'], runtime);
+  assert.equal(privateUrl.length > 0, true);
+  const oversized = await dispatchFeature(manifest, event, ['https://example.com/' + 'x'.repeat(2048)], runtime);
+  assert.equal(oversized.length > 0, true);
+  const control = await dispatchFeature(manifest, event, ['https://example.com/a' + String.fromCharCode(0) + 'b'], runtime);
+  assert.equal(control.length > 0, true);
+});
