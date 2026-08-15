@@ -10,3 +10,14 @@ test('event normalization handles message segments and runtime bot', () => {
   assert.equal(event.userId, '1');
   assert.equal(event.groupId, '2');
 });
+
+
+test('事件主人标记兼容并保留角色', () => {
+  const stringOwner = normalizeEvent({ msg: '云锦', isMaster: 'true', sender: { role: 'admin', user_id: 'u1' } });
+  const snakeOwner = normalizeEvent({ msg: '云锦', is_master: 1, sender: { role: 'owner', user_id: 'u2' } });
+  const falseOwner = normalizeEvent({ msg: '云锦', isMaster: 'false', sender: { role: 'member', user_id: 'u3' } });
+  assert.equal(stringOwner.isMaster, true);
+  assert.equal(stringOwner.role, 'admin');
+  assert.equal(snakeOwner.isMaster, true);
+  assert.equal(falseOwner.isMaster, false);
+});
