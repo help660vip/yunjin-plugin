@@ -38,3 +38,29 @@ test('config writes are atomic JSON and reloadable', async () => {
   await service.reload();
   assert.equal(service.getGlobal('core.reply_mode'), 'text');
 });
+
+
+test('配置读取会忽略持久化无效值并保留默认值', async () => {
+  const dir = await makeTempDir();
+  const file = path.join(dir, 'config.json');
+  await fs.writeFile(file, JSON.stringify({ version: 1, global: { 'core.hot_reload': 'yes', 'unknown.key': true } }));
+  const service = new ConfigService({ repository: new JsonRepository(file) });
+  await service.initialize();
+  assert.equal(service.getGlobal('core.hot_reload'), true);
+  assert.equal(service.getEffective({})['core.hot_reload'], true);
+  assert.equal(Object.hasOwn(service.getEffective({}), 'unknown.key'), false);
+  const validation = await service.validate();
+  assert.equal(validation.ok, false);
+  assert.equal(validation.errors.some((item) => item.key === 'core.hot_reload'), true);
+});
+
+test('配置支持中文作用域别名并正确隐藏敏感值', async () => {
+  const dir = await makeTempDir();
+  const service = new ConfigService({ repository: new JsonRepository(path.join(dir, 'config.json')) });
+  service.registerSchema('27', { 'providers.api_key': { type: 'string', default: '' } });
+  await service.initialize();
+  assert.equal((await service.set({ name: '群', id: 'g1' }, 'core.enabled', false)).ok, true);
+  assert.equal(service.getEffective({ groupId: 'g1' })['core.enabled'], false);
+  await service.set({ name: '全局' }, 'providers.api_key', 'secret-value');
+  assert.equal((await service.getEffectiveValue({ name: '用户', id: 'u1' }, 'providers.api_key')).value, '[已隐藏]');
+});
