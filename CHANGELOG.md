@@ -171,3 +171,7 @@
 ## v1.2.5
 
 - Hardened scheduled broadcasts with explicit group isolation, scoped cancellation, strict action arguments, bounded content, dependency fallback, failure audits, and regression coverage.
+
+## v1.2.6
+
+- Hardened group reports with explicit chat scope, strict actions, bounded persisted history, readable storage failure handling, and audit coverage.

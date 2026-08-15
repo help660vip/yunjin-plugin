@@ -126,3 +126,7 @@ The persisted queue is available through `#云锦推送`. Use `#云锦推送 重
 ### v1.2.5
 
 - #云锦 broadcast tasks now enforce group scope and safe scheduling fallbacks.
+
+### v1.2.6
+
+- #云锦 group reports now enforce chat scope and safe persistence fallbacks.

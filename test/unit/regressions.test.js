@@ -549,4 +549,13 @@ test('broadcast scheduler validates scope, arguments and dependency fallback', a
   assert.match(await dispatchFeature(manifest, event, [], unavailable), /\u8c03\u5ea6\u670d\u52a1\u4e0d\u53ef\u7528/)
   assert.match(await dispatchFeature(manifest, { ...event, groupId: 'private' }, [], runtime), /\u53ea\u80fd\u5728\u7fa4\u804a/)
 })
+test('group report validates scope, actions and persisted summary', async () => {
+  const manifest = featureManifests.find(item => item.id === '22')
+  const runtime = runtimeWithState()
+  const event = { botId: 'bot', groupId: 'g1', userId: 'u1', role: 'member', isMaster: false }
+  assert.match(await dispatchFeature(manifest, event, [], runtime), /\u7fa4\u7ec4\u62a5\u544a/)
+  assert.match(await dispatchFeature(manifest, event, ['\u751f\u6210', 'extra'], runtime), /\u0023\u4e91\u9526/)
+  assert.match(await dispatchFeature(manifest, event, ['unknown'], runtime), /\u0023\u4e91\u9526/)
+  assert.match(await dispatchFeature(manifest, { ...event, groupId: 'private' }, [], runtime), /\u53ea\u80fd\u5728\u7fa4\u804a/)
+})
 
