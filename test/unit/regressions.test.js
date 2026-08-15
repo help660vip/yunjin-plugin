@@ -820,3 +820,21 @@ test('autoreply validates rules, group scope and actions', async () => {
   const empty = await dispatchFeature(manifest, event, ['list'], runtime);
   assert.equal(empty.includes('hello'), false);
 });
+
+test('word bank validates terms, group scope and actions', async () => {
+  const runtime = runtimeWithState();
+  const manifest = featureManifests.find((item) => item.id === '42');
+  const event = { botId: 'b', groupId: 'g', userId: 'u', isAdmin: true };
+  const oversized = await dispatchFeature(manifest, event, ['add', 'x'.repeat(201)], runtime);
+  assert.equal(oversized.length > 0, true);
+  const added = await dispatchFeature(manifest, event, ['add', 'keyword'], runtime);
+  assert.equal(added.length > 0, true);
+  const listed = await dispatchFeature(manifest, event, ['list'], runtime);
+  assert.equal(listed.includes('1. keyword'), true);
+  const other = await dispatchFeature(manifest, { ...event, groupId: 'other' }, ['list'], runtime);
+  assert.equal(other.includes('keyword'), false);
+  const deleted = await dispatchFeature(manifest, event, ['delete', 'keyword'], runtime);
+  assert.equal(deleted.length > 0, true);
+  const empty = await dispatchFeature(manifest, event, ['list'], runtime);
+  assert.equal(empty.includes('keyword'), false);
+});
