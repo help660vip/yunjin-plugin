@@ -407,3 +407,13 @@ test('auto-enter group list validates group ids and actions', async () => {
   assert.match(await dispatchFeature(manifest,event,['\u5217\u8868','extra'],runtime),/\u0023\u4e91\u9526\u5165\u7fa4/)
   assert.match(await dispatchFeature(manifest,event,['unknown'],runtime),/\u0023\u4e91\u9526\u5165\u7fa4/)
 })
+test('friend request list validates user ids and actions', async () => {
+  const manifest=featureManifests.find(item => item.id==='14')
+  const runtime=runtimeWithState()
+  const event={botId:'bot',groupId:'g1',userId:'u1',role:'master',isMaster:true}
+  assert.match(await dispatchFeature(manifest,event,['\u6dfb\u52a0','user-1'],runtime),/\u597d\u53cb\u7533\u8bf7\u540d\u5355\u5df2\u6dfb\u52a0/)
+  assert.match(await dispatchFeature(manifest,event,['\u5220\u9664','user-1'],runtime),/\u597d\u53cb\u7533\u8bf7\u540d\u5355\u5df2\u5220\u9664/)
+  assert.match(await dispatchFeature(manifest,event,['\u6dfb\u52a0','bad!'],runtime),/ID \u5fc5\u987b/)
+  assert.match(await dispatchFeature(manifest,event,['\u5217\u8868','extra'],runtime),/\u0023\u4e91\u9526/)
+  assert.match(await dispatchFeature(manifest,event,['unknown'],runtime),/\u0023\u4e91\u9526/)
+})
