@@ -18,6 +18,7 @@
 ### 底座与运行
 
 `#云锦状态`、`#云锦报错`、`#云锦日志`、`#云锦事务`、`#云锦监控`、`#云锦调度`、`#云锦帮助`、`#云锦配置`
+重复异常会在当前作用域合并计数，并保留首次与最近发生时间。
 
 - `#云锦状态` displays runtime, scheduler, notification, and renderer health with text fallback when host capabilities are unavailable.
 

@@ -232,3 +232,21 @@ test('passive group telemetry persists one incoming message across enabled views
   assert.equal(values.some((value) => Array.isArray(value?.events) && value.events[0]?.messageId === 'm1'), true);
   assert.equal(values.some((value) => Array.isArray(value?.messages) && value.messages[0]?.messageId === 'm1'), true);
 });
+
+test('report action merges repeated scoped errors', async () => {
+  const runtime = runtimeWithState();
+  const manifest = featureManifests.find((item) => item.id === '02');
+  const event = { botId: 'b', groupId: 'g', userId: 'u' };
+  const first = await dispatchFeature(manifest, event, ['\u8fde\u63a5\u8d85\u65f6'], runtime);
+  const second = await dispatchFeature(manifest, event, ['\u8fde\u63a5\u8d85\u65f6'], runtime);
+  assert.match(first, /\u5f02\u5e38\u5df2\u8bb0\u5f55/u);
+  assert.match(second, /\u91cd\u590d 2 \u6b21/u);
+  const root = await runtime.stateRepository.read({});
+  const state = Object.values(root)[0];
+  assert.equal(state.items.length, 1);
+  assert.equal(state.items[0].occurrences, 2);
+  const otherScope = await dispatchFeature(manifest, { ...event, groupId: 'other' }, ['\u8fde\u63a5\u8d85\u65f6'], runtime);
+  assert.match(otherScope, /\u5f02\u5e38\u5df2\u8bb0\u5f55/u);
+  const states = Object.values(await runtime.stateRepository.read({}));
+  assert.equal(states.length, 2);
+});
