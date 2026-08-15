@@ -838,3 +838,16 @@ test('word bank validates terms, group scope and actions', async () => {
   const empty = await dispatchFeature(manifest, event, ['list'], runtime);
   assert.equal(empty.includes('keyword'), false);
 });
+
+test('group summary validates actions, bounds and render fallback', async () => {
+  const runtime = runtimeWithState();
+  const manifest = featureManifests.find((item) => item.id === '43');
+  const event = { botId: 'b', groupId: 'g', userId: 'u', isAdmin: true };
+  const summary = await dispatchFeature(manifest, event, ['generate'], runtime);
+  assert.equal(summary.includes('g'), true);
+  assert.equal(summary.includes('NaN'), false);
+  const invalid = await dispatchFeature(manifest, event, ['unknown'], runtime);
+  assert.equal(invalid.length > 0, true);
+  const cleared = await dispatchFeature(manifest, event, ['clear'], runtime);
+  assert.equal(cleared.length > 0, true);
+});
