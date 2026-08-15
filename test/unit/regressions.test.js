@@ -934,3 +934,14 @@ test('\u5e2e\u52a9\u652f\u6301\u6309\u5173\u952e\u8bcd\u7b5b\u9009\u5e76\u5904\u
   const empty = await dispatchFeature(manifest, event, ['\u4e0d\u5b58\u5728\u7684\u80fd\u529b'], runtime);
   assert.match(empty, /\u6ca1\u6709\u627e\u5230\u5339\u914d/u);
 });
+
+
+test('\u5e2e\u52a9\u8f93\u51fa\u4e0d\u53d7\u6ce8\u518c\u987a\u5e8f\u5f71\u54cd', async () => {
+  const runtime = runtimeWithState();
+  const manifest = featureManifests.find((item) => item.id === '07');
+  const event = { botId: 'b', groupId: 'g', userId: 'u' };
+  const originalList = runtime.registry.list.bind(runtime.registry);
+  runtime.registry.list = (currentEvent) => [...originalList(currentEvent)].reverse();
+  const result = await dispatchFeature(manifest, event, [], runtime);
+  assert.ok(result.indexOf('#\u4e91\u9526\u72b6\u6001') < result.indexOf('#\u4e91\u9526\u5e2e\u52a9'));
+});
