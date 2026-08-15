@@ -328,3 +328,28 @@ test('help groups capabilities and validates areas', async () => {
   const usage = await dispatchFeature(manifest, event, ['unknown'], runtime);
   assert.ok(usage.includes('core|governance|feeds|tools|media|community'));
 });
+test('config command boundaries protect scopes and report dependency failures', async () => {
+  const manifest=featureManifests.find(item => item.id==='08')
+  const runtime=runtimeWithState()
+  runtime.config={
+    schemas:new Set(['core.enabled']),
+    describeEffective:async()=> 'effective',
+    reload:async()=> undefined,
+    validate:async()=> ({ok:true}),
+    getEffectiveValue:async(scope,key)=> ({scope,key}),
+    set:async(scope,key,value)=> ({scope,key,value})
+  }
+  const member={botId:'bot',groupId:'g1',userId:'u1',role:'member',isMaster:false}
+  const op={...member,isMaster:true}
+  assert.match(await dispatchFeature(manifest,member,['\u6821\u9a8c','extra'],runtime),/\u0023\u4e91\u9526\u914d\u7f6e/)
+  assert.match(await dispatchFeature(manifest,member,['\u8bbe\u7f6e','\u5168\u5c40','core.enabled','true'],runtime),/\u53ea\u6709 Yunzai OP/)
+  const opResult=await dispatchFeature(manifest,op,['\u8bbe\u7f6e','\u5168\u5c40','core.enabled','true'],runtime)
+  assert.equal(opResult.scope.name,'global')
+  assert.equal(opResult.key,'core.enabled')
+  assert.equal(opResult.value,true)
+  assert.match(await dispatchFeature(manifest,op,['\u8bbe\u7f6e','\u7fa4','core.enabled','{bad'],runtime),/JSON/)
+  assert.match(await dispatchFeature(manifest,{...member,groupId:'private'},['\u83b7\u53d6','\u7fa4','core.enabled'],runtime),/\u7fa4\u4f5c\u7528\u57df\u53ea\u80fd/)
+  assert.match(await dispatchFeature(manifest,op,['\u83b7\u53d6','\u5168\u5c40','core.enabled','extra'],runtime),/\u0023\u4e91\u9526\u914d\u7f6e/)
+  const unavailable=runtimeWithState()
+  assert.match(await dispatchFeature(manifest,member,[],unavailable),/\u914d\u7f6e\u670d\u52a1\u4e0d\u53ef\u7528/)
+})
