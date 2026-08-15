@@ -8,8 +8,8 @@ export const command = manifest.command;
 export const access = manifest.access;
 export const area = manifest.area;
 export const examples = Object.freeze([
-  '#云锦' + command,
-  '#云锦' + command + ' ' + ((contract?.args || [])[0] || '查看')
+  String.fromCodePoint(0x23, 0x4e91, 0x9526) + command,
+  String.fromCodePoint(0x23, 0x4e91, 0x9526) + command + ' ' + ((contract?.args || [])[0] || '查看')
 ]);
 export const parameterSchema = Object.freeze({
   maxArgs: 30,
@@ -61,8 +61,8 @@ export const acceptance = Object.freeze({
 export function validateArguments(args = []) {
   const values = Array.isArray(args) ? args : [];
   const errors = [];
-  if (values.length > parameterSchema.maxArgs) errors.push('too-many-arguments');
-  if (values.some((value) => String(value).length > parameterSchema.maxTokenLength)) errors.push('argument-too-long');
+  if (values.length > parameterSchema.maxArgs) errors.push('参数数量超过上限。');
+  if (values.some((value) => String(value).length > parameterSchema.maxTokenLength)) errors.push('参数超过长度限制。');
   return { ok: errors.length === 0, errors };
 }
 

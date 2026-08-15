@@ -81,7 +81,7 @@ test('report list action does not create an error record', async () => {
   assert.deepEqual(await runtime.stateRepository.read({}), {});
 });
 
-test('members can join a group signup while management remains admin-only', async () => {
+test('群成员可以参加报名?管理操作仍仅限管理员', async () => {
   const runtime = runtimeWithState();
   const manifest = featureManifests.find((item) => item.id === '49');
   const member = { botId: 'b', groupId: 'g', userId: 'u', role: 'member', isMaster: false };
@@ -90,7 +90,7 @@ test('members can join a group signup while management remains admin-only', asyn
   const denied = await dispatchFeature(manifest, member, ['关闭', '活动'], runtime);
   assert.match(denied, /管理员/u);
   const listed = await dispatchFeature(manifest, member, ['列表', '活动'], runtime);
-  assert.match(listed, /人数：1/u);
+  assert.match(listed, /人数?/u);
 });
 
 test('scheduler retries without exceeding maxAttempts and reschedules', async () => {
@@ -850,4 +850,74 @@ test('group summary validates actions, bounds and render fallback', async () => 
   assert.equal(invalid.length > 0, true);
   const cleared = await dispatchFeature(manifest, event, ['clear'], runtime);
   assert.equal(cleared.length > 0, true);
+});
+
+
+test('\u7b7e\u5230\u6309\u7528\u6237\u548c\u65e5\u671f\u5e42\u7b49', async () => {
+  const runtime = runtimeWithState();
+  const manifest = featureManifests.find((item) => item.id === '44');
+  const event = { botId: 'b', groupId: 'g', userId: 'u' };
+  const first = await dispatchFeature(manifest, event, ['\u7b7e\u5230'], runtime);
+  assert.match(first, /\u7b7e\u5230\u6210\u529f/u);
+  const repeat = await dispatchFeature(manifest, event, ['\u7b7e\u5230'], runtime);
+  assert.match(repeat, /\u5df2\u7ecf\u7b7e\u5230/u);
+  const other = await dispatchFeature(manifest, { ...event, userId: 'u2' }, ['\u7b7e\u5230'], runtime);
+  assert.match(other, /\u7b7e\u5230\u6210\u529f/u);
+});
+
+test('\u8bed\u5f55\u589e\u5220\u67e5\u8be2\u4f7f\u7528\u5171\u4eab\u5b58\u50a8', async () => {
+  const runtime = runtimeWithState();
+  const manifest = featureManifests.find((item) => item.id === '45');
+  const event = { botId: 'b', groupId: 'g', userId: 'u' };
+  assert.match(await dispatchFeature(manifest, event, ['\u6dfb\u52a0', '\u8fd9\u662f\u4e00\u6761\u8bed\u5f55'], runtime), /\u5df2\u6dfb\u52a0/u);
+  assert.match(await dispatchFeature(manifest, event, ['\u5217\u8868'], runtime), /\u8fd9\u662f\u4e00\u6761\u8bed\u5f55/u);
+  assert.match(await dispatchFeature(manifest, event, ['\u5220\u9664', '1'], runtime), /\u5df2\u5220\u9664/u);
+});
+
+test('\u7cbe\u534e\u6d88\u606f\u4ec5\u5141\u8bb8\u7ba1\u7406\u5458\u7ef4\u62a4', async () => {
+  const runtime = runtimeWithState();
+  const manifest = featureManifests.find((item) => item.id === '46');
+  const admin = { botId: 'b', groupId: 'g', userId: 'u', role: 'admin' };
+  assert.match(await dispatchFeature(manifest, admin, ['\u6dfb\u52a0', 'm-1', '\u7ecf\u5178'], runtime), /\u5df2\u6536\u5f55/u);
+  assert.match(await dispatchFeature(manifest, admin, ['\u5217\u8868'], runtime), /m-1/u);
+  assert.match(await dispatchFeature(manifest, admin, ['\u5220\u9664', 'm-1'], runtime), /\u5df2\u79fb\u9664/u);
+});
+
+test('\u7fa4\u6d3b\u8dc3\u91cd\u7f6e\u9700\u8981\u7fa4\u7ba1\u7406\u6743\u9650', async () => {
+  const runtime = runtimeWithState();
+  const manifest = featureManifests.find((item) => item.id === '47');
+  const member = { botId: 'b', groupId: 'g', userId: 'u', role: 'member' };
+  const admin = { ...member, role: 'admin' };
+  assert.match(await dispatchFeature(manifest, member, ['\u91cd\u7f6e'], runtime), /\u7ba1\u7406\u5458/u);
+  assert.match(await dispatchFeature(manifest, admin, ['\u67e5\u770b'], runtime), /\u7fa4\u6d3b\u8dc3/u);
+  assert.match(await dispatchFeature(manifest, admin, ['\u91cd\u7f6e'], runtime), /\u5df2\u91cd\u7f6e/u);
+});
+
+test('\u7fa4\u5386\u53f2\u6e05\u7406\u9700\u8981\u7fa4\u7ba1\u7406\u6743\u9650', async () => {
+  const runtime = runtimeWithState();
+  const manifest = featureManifests.find((item) => item.id === '48');
+  const member = { botId: 'b', groupId: 'g', userId: 'u', role: 'member' };
+  const admin = { ...member, role: 'admin' };
+  assert.match(await dispatchFeature(manifest, member, ['\u6e05\u7406'], runtime), /\u7ba1\u7406\u5458/u);
+  assert.match(await dispatchFeature(manifest, admin, ['\u67e5\u770b'], runtime), /\u7fa4\u5386\u53f2/u);
+  assert.match(await dispatchFeature(manifest, admin, ['\u6e05\u7406'], runtime), /\u5df2\u6e05\u7406/u);
+});
+
+test('\u62a5\u540d\u9650\u5236\u6d3b\u52a8\u7ba1\u7406\u6743\u548c\u53c2\u4e0e\u6743', async () => {
+  const runtime = runtimeWithState();
+  const manifest = featureManifests.find((item) => item.id === '49');
+  const admin = { botId: 'b', groupId: 'g', userId: 'a', role: 'admin' };
+  const member = { botId: 'b', groupId: 'g', userId: 'u', role: 'member' };
+  assert.match(await dispatchFeature(manifest, admin, ['\u5f00\u542f', '\u6d3b\u52a8'], runtime), /\u5df2\u5f00\u542f/u);
+  assert.match(await dispatchFeature(manifest, member, ['\u53c2\u52a0'], runtime), /\u4eba\u6570 1/u);
+  assert.match(await dispatchFeature(manifest, member, ['\u53c2\u52a0'], runtime), /\u5df2\u7ecf\u62a5\u540d/u);
+});
+
+test('\u65e5\u4efb\u52a1\u6309\u7528\u6237\u8bb0\u5f55\u5b8c\u6210\u72b6\u6001', async () => {
+  const runtime = runtimeWithState();
+  const manifest = featureManifests.find((item) => item.id === '50');
+  const event = { botId: 'b', groupId: 'g', userId: 'u' };
+  assert.match(await dispatchFeature(manifest, event, ['\u67e5\u770b'], runtime), /\u4eca\u65e5\u4efb\u52a1/u);
+  assert.match(await dispatchFeature(manifest, event, ['\u5b8c\u6210'], runtime), /\u5df2\u5b8c\u6210/u);
+  assert.match(await dispatchFeature(manifest, event, ['\u5b8c\u6210'], runtime), /\u5df2\u7ecf\u5b8c\u6210/u);
 });

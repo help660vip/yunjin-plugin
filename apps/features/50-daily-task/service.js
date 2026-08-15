@@ -32,7 +32,7 @@ export function validateInput(input = []) {
   const normalized = normalizeInput(input);
   const errors = [];
   if (normalized.inputCount > 30) errors.push('参数数量超过上限。');
-  if (normalized.oversizedArgs > 0) errors.push('argument exceeds limit');
+  if (normalized.oversizedArgs > 0) errors.push('参数超过长度限制。');
   return { ok: errors.length === 0, errors, value: normalized };
 }
 
@@ -52,7 +52,7 @@ export function redactInput(input) {
 export function buildHelp() {
   const usage = (contract?.args || []).join(' ');
   const actionText = (contract?.actions || []).join(' | ');
-  return ['#云锦' + command, contract?.usage || '', actionText ? '操作：' + actionText : '', usage ? '参数：' + usage : '', '权限：' + (contract?.access || 'user'), '依赖：' + dependencies.join('、')].filter(Boolean).join('\n');
+  return [String.fromCodePoint(0x23, 0x4e91, 0x9526) + command, contract?.usage || '', actionText ? '操作?' + actionText : '', usage ? '参数?' + usage : '', '权限?' + (contract?.access || 'user'), '依赖?' + dependencies.join('?')].filter(Boolean).join('\n');
 }
 
 export function health(runtime) {
@@ -71,7 +71,7 @@ export async function run(event, args, runtime) {
   const handlers = await import('../../../lib/features/handlers/index.js');
   const manifest = manifestModule.getFeatureManifest(featureId);
   const handler = handlers.handlerFor(featureId);
-  if (!manifest || typeof handler !== 'function') return '能力 handler 尚未注册。';
+  if (!manifest || typeof handler !== 'function') return '能力处理器尚未注册。';
   return handler(manifest, event, validation.value.args, runtime);
 }
 
@@ -108,7 +108,7 @@ export function auditPayload(event, input, action) {
 export function failure(code, detail = '') {
   const messages = { invalid: '参数不合法', permission: '权限不足', rate: '请求过于频繁', quota: '已达到配额上限', dependency: '依赖不可用', scope: '作用域信息缺失' };
   const message = messages[code] || '操作失败';
-  return cleanText(detail ? message + ': ' + detail : message, { max: operationPolicy.maxOutputLength });
+  return cleanText(detail ? message + '?' + detail : message, { max: operationPolicy.maxOutputLength });
 }
 
 export function operationPlan(event, input) {
