@@ -7,7 +7,7 @@ export const featureSlug = 'save-pic';
 export const contract = Object.freeze(contractFor(featureId));
 export const actions = Object.freeze([...(contract?.actions || [])]);
 export const dependencies = Object.freeze([...(contract?.dependencies || [])]);
-export const command = '收图';
+export const command = String.fromCodePoint(0x6536, 0x56fe);
 
 function valueOf(input) {
   if (Array.isArray(input)) return input.map((item) => cleanText(item, { max: 1000 }));
@@ -31,8 +31,8 @@ export function normalizeInput(input = []) {
 export function validateInput(input = []) {
   const normalized = normalizeInput(input);
   const errors = [];
-  if (normalized.inputCount > 30) errors.push('参数数量超过上限。');
-  if (normalized.oversizedArgs > 0) errors.push('argument exceeds limit');
+  if (normalized.inputCount > 30) errors.push('\u53c2\u6570\u6570\u91cf\u8d85\u8fc7\u4e0a\u9650\u3002');
+  if (normalized.oversizedArgs > 0) errors.push('\u53c2\u6570\u957f\u5ea6\u8d85\u8fc7\u4e0a\u9650\u3002');
   return { ok: errors.length === 0, errors, value: normalized };
 }
 
@@ -46,13 +46,13 @@ export function identityFor(event) {
 
 export function redactInput(input) {
   const normalized = normalizeInput(input);
-  return { args: normalized.args.map((item) => item.length > 160 ? item.slice(0, 160) + '…' : item), flags: Object.keys(normalized.flags) };
+  return { args: normalized.args.map((item) => item.length > 160 ? item.slice(0, 160) + '\u2026' : item), flags: Object.keys(normalized.flags) };
 }
 
 export function buildHelp() {
   const usage = (contract?.args || []).join(' ');
   const actionText = (contract?.actions || []).join(' | ');
-  return ['#云锦' + command, contract?.usage || '', actionText ? '操作：' + actionText : '', usage ? '参数：' + usage : '', '权限：' + (contract?.access || 'user'), '依赖：' + dependencies.join('、')].filter(Boolean).join('\n');
+  return ['#\u4e91\u9526' + command, contract?.usage || '', actionText ? '\u64cd\u4f5c?' + actionText : '', usage ? '\u53c2\u6570?' + usage : '', '\u6743\u9650?' + (contract?.access || 'user'), '\u4f9d\u8d56?' + dependencies.join('?')].filter(Boolean).join('\n');
 }
 
 export function health(runtime) {
@@ -66,12 +66,12 @@ export function resultMeta(value) {
 
 export async function run(event, args, runtime) {
   const validation = validateInput(args);
-  if (!validation.ok) return validation.errors.join('\n');
+  if (!validation.ok) return validation.errors.join(String.fromCharCode(10));
   const manifestModule = await import('../../manifest.js');
   const handlers = await import('../../../lib/features/handlers/index.js');
   const manifest = manifestModule.getFeatureManifest(featureId);
   const handler = handlers.handlerFor(featureId);
-  if (!manifest || typeof handler !== 'function') return '能力 handler 尚未注册。';
+  if (!manifest || typeof handler !== 'function') return '\u80fd\u529b\u5904\u7406\u5668\u5c1a\u672a\u6ce8\u518c\u3002';
   return handler(manifest, event, validation.value.args, runtime);
 }
 
@@ -106,9 +106,9 @@ export function auditPayload(event, input, action) {
 }
 
 export function failure(code, detail = '') {
-  const messages = { invalid: '参数不合法', permission: '权限不足', rate: '请求过于频繁', quota: '已达到配额上限', dependency: '依赖不可用', scope: '作用域信息缺失' };
-  const message = messages[code] || '操作失败';
-  return cleanText(detail ? message + ': ' + detail : message, { max: operationPolicy.maxOutputLength });
+  const messages = { invalid: '\u53c2\u6570\u4e0d\u5408\u6cd5', permission: '\u6743\u9650\u4e0d\u8db3', rate: '\u8bf7\u6c42\u8fc7\u4e8e\u9891\u7e41', quota: '\u5df2\u8fbe\u5230\u914d\u989d\u4e0a\u9650', dependency: '\u4f9d\u8d56\u4e0d\u53ef\u7528', scope: '\u4f5c\u7528\u57df\u4fe1\u606f\u7f3a\u5931' };
+  const message = messages[code] || '\u64cd\u4f5c\u5931\u8d25';
+  return cleanText(detail ? message + '?' + detail : message, { max: operationPolicy.maxOutputLength });
 }
 
 export function operationPlan(event, input) {

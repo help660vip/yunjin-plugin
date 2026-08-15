@@ -768,3 +768,21 @@ test('meme generation validates bounded template and text fallback', async () =>
   const control = await dispatchFeature(manifest, event, ['generate', 'card', 'a' + String.fromCharCode(0) + 'b'], runtime);
   assert.equal(control.length > 0, true);
 });
+
+test('image saving validates actions, bounds and user scope', async () => {
+  const runtime = runtimeWithState();
+  const manifest = featureManifests.find((item) => item.id === '39');
+  const event = { botId: 'b', groupId: 'g', userId: 'u', segments: [{ type: 'image', url: 'https://example.com/a.png' }] };
+  const saved = await dispatchFeature(manifest, event, [], runtime);
+  assert.equal(saved.includes('1'), true);
+  const listed = await dispatchFeature(manifest, { ...event, segments: [] }, ['list'], runtime);
+  assert.equal(listed.includes('example.com'), true);
+  const other = await dispatchFeature(manifest, { ...event, userId: 'other', segments: [] }, ['list'], runtime);
+  assert.equal(other.includes('example.com'), false);
+  const privateUrl = await dispatchFeature(manifest, { ...event, segments: [] }, ['save', 'http://127.0.0.1/a.png'], runtime);
+  assert.equal(privateUrl.length > 0, true);
+  const tooMany = await dispatchFeature(manifest, { ...event, segments: [] }, ['save', ...Array.from({ length: 11 }, (_, index) => 'https://example.com/' + index + '.png')], runtime);
+  assert.equal(tooMany.length > 0, true);
+  const invalidDelete = await dispatchFeature(manifest, { ...event, segments: [] }, ['delete', 'bad id'], runtime);
+  assert.equal(invalidDelete.length > 0, true);
+});

@@ -8,8 +8,8 @@ export const command = manifest.command;
 export const access = manifest.access;
 export const area = manifest.area;
 export const examples = Object.freeze([
-  '#云锦' + command,
-  '#云锦' + command + ' ' + ((contract?.args || [])[0] || '查看')
+  String.fromCodePoint(0x23, 0x4e91, 0x9526) + command,
+  String.fromCodePoint(0x23, 0x4e91, 0x9526) + command + ' ' + ((contract?.args || [])[0] || '\u67e5\u770b')
 ]);
 export const parameterSchema = Object.freeze({
   maxArgs: 30,
@@ -41,14 +41,7 @@ export const dependencyPolicy = Object.freeze({
   optional: true,
   missingBehavior: 'explicit-degradation'
 });
-export const failureMatrix = Object.freeze([
-  'normal input returns a user-visible result',
-  'invalid arguments return usage without side effects',
-  'insufficient permission is rejected by rule and service',
-  'rate limit returns a bounded retry response',
-  'missing dependency returns explicit fallback',
-  'scope and bot identifiers remain isolated'
-]);
+export const failureMatrix = Object.freeze(['\u4fdd\u5b58\u5b89\u5168\u56fe\u7247\u5f15\u7528', '\u53c2\u6570\u9519\u8bef\u8fd4\u56de\u7528\u6cd5', '\u6743\u9650\u4e0d\u8db3\u88ab\u62d2\u7edd', '\u8bf7\u6c42\u8d85\u9890\u8fd4\u56de\u91cd\u8bd5\u63d0\u793a', '\u5b58\u50a8\u7f3a\u5931\u660e\u786e\u964d\u7ea7', '\u7528\u6237\u8303\u56f4\u4fdd\u6301\u9694\u79bb']);
 export const acceptance = Object.freeze({
   featureId,
   command,
