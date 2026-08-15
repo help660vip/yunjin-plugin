@@ -314,3 +314,17 @@ test('scheduler actions validate arguments and audit cancellation', async () => 
   assert.match(cancelled, /\u4efb\u52a1\u5df2\u53d6\u6d88/u);
   assert.equal(runtime.scheduler.tasks[0].status, 'cancelled');
 });
+
+test('help groups capabilities and validates areas', async () => {
+  const runtime = runtimeWithState();
+  const manifest = featureManifests.find((item) => item.id === '07');
+  const event = { botId: 'b', groupId: 'g', userId: 'u' };
+  const all = await dispatchFeature(manifest, event, [], runtime);
+  assert.ok(all.includes('\u57fa\u7840\u8fd0\u884c'));
+  assert.ok(all.includes('#\u4e91\u9526\u72b6\u6001'));
+  const core = await dispatchFeature(manifest, event, ['\u67e5\u770b', 'core'], runtime);
+  assert.ok(core.includes('\u57fa\u7840\u8fd0\u884c'));
+  assert.ok(!core.includes('\u793e\u533a\u4e92\u52a8'));
+  const usage = await dispatchFeature(manifest, event, ['unknown'], runtime);
+  assert.ok(usage.includes('core|governance|feeds|tools|media|community'));
+});
