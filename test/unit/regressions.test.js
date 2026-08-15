@@ -264,3 +264,21 @@ test('log archive validates actions and reports clear count', async () => {
   const empty = await dispatchFeature(manifest, event, ['\u6e05\u7406'], runtime);
   assert.match(empty, /\u6ca1\u6709\u65e5\u5fd7/u);
 });
+
+test('transaction updates are atomic and terminal operations are idempotent', async () => {
+  const runtime = runtimeWithState();
+  const manifest = featureManifests.find((item) => item.id === '04');
+  const event = { botId: 'b', groupId: 'g', userId: 'u' };
+  const started = await dispatchFeature(manifest, event, ['\u90e8\u7f72\u4efb\u52a1'], runtime);
+  assert.match(started, /\u4e8b\u52a1\u5df2\u5f00\u59cb/u);
+  const { featureStore } = await import('../../lib/features/store.js');
+  const item = (await featureStore(runtime, '04', event).list('items'))[0];
+  const finished = await dispatchFeature(manifest, event, ['\u7ed3\u675f', item.id], runtime);
+  assert.match(finished, /\u4e8b\u52a1\u5df2\u66f4\u65b0/u);
+  const repeated = await dispatchFeature(manifest, event, ['\u7ed3\u675f', item.id], runtime);
+  assert.match(repeated, /\u7ec8\u6001/u);
+  const state = (await featureStore(runtime, '04', event).list('items'))[0];
+  assert.equal(state.status, 'done');
+  const usage = await dispatchFeature(manifest, event, ['\u672a\u77e5', 'extra'], runtime);
+  assert.ok(usage.includes('\u5f00\u59cb'));
+});
