@@ -154,3 +154,7 @@ The persisted queue is available through `#云锦推送`. Use `#云锦推送 重
 ### v1.3.2
 
 - #云锦 image search now enforces bounded keywords and quota-safe fallback.
+
+### v1.3.3
+
+- #云锦 QR generation now validates long text and URL input before rendering.

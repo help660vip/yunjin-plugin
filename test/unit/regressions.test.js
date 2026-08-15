@@ -631,4 +631,12 @@ test('image search validates bounded query and safe encoding', async () => {
   assert.match(String(result), /cats|Bing|\u56fe\u7247\u641c\u7d22|\u914d\u989d\u4e0d\u8db3/)
   assert.match(await dispatchFeature(manifest, event, ['a'.repeat(129)], runtime), /\u0023\u4e91\u9526|argument exceeds limit/)
 })
+test('qr generation validates bounded content and text fallback', async () => {
+  const manifest = featureManifests.find(item => item.id === '29')
+  const runtime = runtimeWithState()
+  const event = { botId: 'bot', groupId: 'g1', userId: 'u1', role: 'member', isMaster: false }
+  const result = await dispatchFeature(manifest, event, ['https://example.com/a?x=1&y=2'], runtime)
+  assert.match(String(result), /\u4e8c\u7ef4\u7801|qrserver|example\.com/)
+  assert.match(await dispatchFeature(manifest, event, ['a'.repeat(2049)], runtime), /\u0023\u4e91\u9526|argument exceeds limit/)
+})
 

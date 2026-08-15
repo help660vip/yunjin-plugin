@@ -199,3 +199,7 @@
 ## v1.3.2
 
 - Hardened image search with bounded keywords, control-character rejection, quota failure fallback, safe query encoding, and audit coverage.
+
+## v1.3.3
+
+- Hardened QR generation with bounded content, control-character rejection, safe parameter encoding, audit coverage, and renderer text fallback.
