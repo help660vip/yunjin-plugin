@@ -558,4 +558,14 @@ test('group report validates scope, actions and persisted summary', async () => 
   assert.match(await dispatchFeature(manifest, event, ['unknown'], runtime), /\u0023\u4e91\u9526/)
   assert.match(await dispatchFeature(manifest, { ...event, groupId: 'private' }, [], runtime), /\u53ea\u80fd\u5728\u7fa4\u804a/)
 })
+test('push retry validates scope, limits and dependency fallback', async () => {
+  const manifest = featureManifests.find(item => item.id === '23')
+  const runtime = runtimeWithState()
+  const event = { botId: 'bot', groupId: 'g1', userId: 'u1', role: 'member', isMaster: false }
+  assert.match(await dispatchFeature(manifest, event, [], runtime), /\u6682\u65e0\u8bb0\u5f55|\u6682\u65e0\u63a8\u9001/)
+  assert.match(await dispatchFeature(manifest, event, ['\u91cd\u8bd5', 'missing', 'extra'], runtime), /\u0023\u4e91\u9526/)
+  assert.match(await dispatchFeature(manifest, event, ['\u91cd\u8bd5', 'missing'], runtime), /\u672a\u627e\u5230/)
+  assert.match(await dispatchFeature(manifest, event, ['unknown'], runtime), /\u0023\u4e91\u9526/)
+  assert.match(await dispatchFeature(manifest, { ...event, groupId: 'private' }, [], runtime), /\u53ea\u80fd\u5728\u7fa4\u804a/)
+})
 

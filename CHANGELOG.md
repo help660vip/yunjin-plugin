@@ -175,3 +175,7 @@
 ## v1.2.6
 
 - Hardened group reports with explicit chat scope, strict actions, bounded persisted history, readable storage failure handling, and audit coverage.
+
+## v1.2.7
+
+- Hardened push retries with strict actions, group isolation, a bounded retry count, notification fallback, state-save error handling, and audit coverage.

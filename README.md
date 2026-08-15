@@ -130,3 +130,7 @@ The persisted queue is available through `#云锦推送`. Use `#云锦推送 重
 ### v1.2.6
 
 - #云锦 group reports now enforce chat scope and safe persistence fallbacks.
+
+### v1.2.7
+
+- #云锦 push retries now enforce bounded attempts and readable dependency fallbacks.
