@@ -300,3 +300,17 @@ test('monitor add preserves IDs and rolls back scheduler failures', async () => 
   await assert.rejects(() => dispatchFeature(manifest, event, ['\u6dfb\u52a0', 'https://example.org'], failing));
   assert.equal((await featureStore(failing, '05', event).list('items')).length, 0);
 });
+
+test('scheduler actions validate arguments and audit cancellation', async () => {
+  const runtime = runtimeWithState();
+  runtime.scheduler = { tasks: [], async list() { return this.tasks; }, async find(id) { return this.tasks.find((task) => task.id === id); }, async create(payload) { const task = { ...payload, id: 'task-1', status: 'scheduled', runAt: 1000 }; this.tasks.push(task); return task; }, async cancel(id) { const task = this.tasks.find((entry) => entry.id === id); if (!task || task.status !== 'scheduled') return false; task.status = 'cancelled'; return true; } };
+  const manifest = featureManifests.find((item) => item.id === '06');
+  const event = { botId: 'b', groupId: 'g', userId: 'u' };
+  const created = await dispatchFeature(manifest, event, ['1m', '\u4e00\u5206\u949f\u540e\u63d0\u9192'], runtime);
+  assert.match(created, /\u4efb\u52a1\u5df2\u521b\u5efa/u);
+  const usage = await dispatchFeature(manifest, event, ['\u5217\u8868', 'extra'], runtime);
+  assert.ok(usage.includes('\u5217\u8868'));
+  const cancelled = await dispatchFeature(manifest, event, ['\u53d6\u6d88', 'task-1'], runtime);
+  assert.match(cancelled, /\u4efb\u52a1\u5df2\u53d6\u6d88/u);
+  assert.equal(runtime.scheduler.tasks[0].status, 'cancelled');
+});
