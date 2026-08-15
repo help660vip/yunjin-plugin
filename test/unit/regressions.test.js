@@ -368,3 +368,14 @@ test('permission summary validates actions and audits effective scopes', async (
   assert.match(await dispatchFeature(manifest,member,['\u67e5\u770b','extra'],runtime),/\u0023\u4e91\u9526\u6743\u9650/)
   assert.match(await dispatchFeature(manifest,member,['unknown'],runtime),/\u0023\u4e91\u9526\u6743\u9650/)
 })
+test('namelist actions validate type, identity and deletion audit boundaries', async () => {
+  const manifest=featureManifests.find(item => item.id==='10')
+  const runtime=runtimeWithState()
+  const event={botId:'bot',groupId:'g1',userId:'u1',role:'admin',isMaster:false}
+  assert.match(await dispatchFeature(manifest,event,['\u6dfb\u52a0','\u7fa4','g1'],runtime),/\u540d\u5355\u5df2\u6dfb\u52a0/)
+  assert.match(await dispatchFeature(manifest,event,['\u5220\u9664','\u7528\u6237','g1'],runtime),/\u672a\u627e\u5230/)
+  assert.match(await dispatchFeature(manifest,event,['\u5220\u9664','\u7fa4','g1'],runtime),/\u540d\u5355\u5df2\u5220\u9664/)
+  assert.match(await dispatchFeature(manifest,event,['\u6dfb\u52a0','invalid','x'],runtime),/\u7c7b\u578b\u5fc5\u987b/)
+  assert.match(await dispatchFeature(manifest,event,['\u5217\u8868','extra'],runtime),/\u0023\u4e91\u9526\u540d\u5355/)
+  assert.match(await dispatchFeature(manifest,event,['unknown'],runtime),/\u0023\u4e91\u9526\u540d\u5355/)
+})
