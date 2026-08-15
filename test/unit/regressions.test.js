@@ -353,3 +353,18 @@ test('config command boundaries protect scopes and report dependency failures', 
   const unavailable=runtimeWithState()
   assert.match(await dispatchFeature(manifest,member,[],unavailable),/\u914d\u7f6e\u670d\u52a1\u4e0d\u53ef\u7528/)
 })
+
+test('permission summary validates actions and audits effective scopes', async () => {
+  const manifest=featureManifests.find(item => item.id==='09')
+  const runtime=runtimeWithState()
+  const member={botId:'bot',groupId:'g1',userId:'u1',role:'member',isMaster:false}
+  const op={...member,isMaster:true}
+  const memberResult=await dispatchFeature(manifest,member,['\u67e5\u770b'],runtime)
+  assert.match(memberResult,/\u5f53\u524d\u6743\u9650/)
+  assert.match(memberResult,/\u5168\u5c40\u914d\u7f6e/)
+  assert.match(memberResult,/\u4ec5 Yunzai OP/)
+  const opResult=await dispatchFeature(manifest,op,['view'],runtime)
+  assert.match(opResult,/\u53ef\u4fee\u6539/)
+  assert.match(await dispatchFeature(manifest,member,['\u67e5\u770b','extra'],runtime),/\u0023\u4e91\u9526\u6743\u9650/)
+  assert.match(await dispatchFeature(manifest,member,['unknown'],runtime),/\u0023\u4e91\u9526\u6743\u9650/)
+})
