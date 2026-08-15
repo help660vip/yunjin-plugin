@@ -170,3 +170,7 @@ The persisted queue is available through `#云锦推送`. Use `#云锦推送 重
 ### v1.3.6
 
 - #云锦 encyclopedia lookup now has bounded queries and readable service fallbacks.
+
+### v1.3.7
+
+- 33 汇率换算：支持金额边界校验、同币种本地结果、外部服务安全降级和审计。

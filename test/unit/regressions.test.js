@@ -12,6 +12,7 @@ import { NotificationBus } from '../../lib/notification/bus.js';
 import { handlerContext } from '../../lib/features/handlers/context.js';
 import { handleRequestEvent } from '../../lib/features/handlers/core.js';
 import { normalizeEvent } from '../../lib/runtime/event.js';
+import { handle33 } from '../../lib/features/handlers/tools.js';
 
 function runtimeWithState(initial = {}) {
   return {
@@ -665,3 +666,18 @@ test('wiki lookup validates bounded query and dependency fallback', async () => 
   assert.match(await dispatchFeature(manifest, event, ['\u4e91\u9526'], runtime), /\u767e\u79d1\u670d\u52a1\u4e0d\u53ef\u7528|\u6458\u8981|\u6682\u65e0\u6458\u8981/)
 })
 
+
+
+test('exchange rate validates bounded input and dependency fallback', async () => {
+  const runtime = runtimeWithState();
+  const manifest = featureManifests.find((item) => item.id === '33');
+  const event = { botId: 'b', groupId: 'g', userId: 'u' };
+  const invalid = await handle33(manifest, event, ['abc', 'CNY', 'USD'], runtime);
+  assert.equal(typeof invalid, 'string');
+  assert.equal(invalid.length > 0, true);
+  const oversized = await handle33(manifest, event, ['1000000000001', 'CNY', 'USD'], runtime);
+  assert.equal(oversized.length > 0, true);
+  assert.equal((await handle33(manifest, event, ['10', 'CNY', 'CNY'], runtime)).includes('10 CNY'), true);
+  const fallback = await handle33(manifest, event, ['10', 'CNY', 'USD'], runtime);
+  assert.equal(fallback.startsWith(String.fromCodePoint(27719, 29575)), true);
+});
