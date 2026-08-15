@@ -786,3 +786,19 @@ test('image saving validates actions, bounds and user scope', async () => {
   const invalidDelete = await dispatchFeature(manifest, { ...event, segments: [] }, ['delete', 'bad id'], runtime);
   assert.equal(invalidDelete.length > 0, true);
 });
+
+test('media reference validates actions, bounds and user scope', async () => {
+  const runtime = runtimeWithState();
+  const manifest = featureManifests.find((item) => item.id === '40');
+  const event = { botId: 'b', groupId: 'g', userId: 'u', segments: [{ type: 'audio', url: 'https://example.com/a.mp3', name: 'voice' }] };
+  const recorded = await dispatchFeature(manifest, event, [], runtime);
+  assert.equal(recorded.includes('1'), true);
+  const listed = await dispatchFeature(manifest, { ...event, segments: [] }, ['list'], runtime);
+  assert.equal(listed.includes('1. voice'), true);
+  const other = await dispatchFeature(manifest, { ...event, userId: 'other', segments: [] }, ['list'], runtime);
+  assert.equal(other.includes('example.com'), false);
+  const privateUrl = await dispatchFeature(manifest, { ...event, segments: [] }, ['record', 'http://127.0.0.1/a.mp3'], runtime);
+  assert.equal(privateUrl.length > 0, true);
+  const tooMany = await dispatchFeature(manifest, { ...event, segments: [] }, ['record', ...Array.from({ length: 11 }, (_, index) => 'https://example.com/' + index + '.mp3')], runtime);
+  assert.equal(tooMany.length > 0, true);
+});
