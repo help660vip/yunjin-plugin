@@ -921,3 +921,16 @@ test('\u65e5\u4efb\u52a1\u6309\u7528\u6237\u8bb0\u5f55\u5b8c\u6210\u72b6\u6001',
   assert.match(await dispatchFeature(manifest, event, ['\u5b8c\u6210'], runtime), /\u5df2\u5b8c\u6210/u);
   assert.match(await dispatchFeature(manifest, event, ['\u5b8c\u6210'], runtime), /\u5df2\u7ecf\u5b8c\u6210/u);
 });
+
+
+test('\u5e2e\u52a9\u652f\u6301\u6309\u5173\u952e\u8bcd\u7b5b\u9009\u5e76\u5904\u7406\u7a7a\u7ed3\u679c', async () => {
+  const runtime = runtimeWithState();
+  const manifest = featureManifests.find((item) => item.id === '07');
+  const event = { botId: 'b', groupId: 'g', userId: 'u' };
+  const matched = await dispatchFeature(manifest, event, ['\u5929\u6c14'], runtime);
+  assert.match(matched, /\u5929\u6c14/u);
+  const viewed = await dispatchFeature(manifest, event, ['\u67e5\u770b', '\u5929\u6c14'], runtime);
+  assert.match(viewed, /\u7b5b\u9009/u);
+  const empty = await dispatchFeature(manifest, event, ['\u4e0d\u5b58\u5728\u7684\u80fd\u529b'], runtime);
+  assert.match(empty, /\u6ca1\u6709\u627e\u5230\u5339\u914d/u);
+});
