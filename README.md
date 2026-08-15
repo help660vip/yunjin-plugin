@@ -142,3 +142,7 @@ The persisted queue is available through `#云锦推送`. Use `#云锦推送 重
 ### v1.2.9
 
 - #云锦 Git polling now uses safe URL handling and transactional scheduler setup.
+
+### v1.3.0
+
+- #云锦 weather lookup now has bounded input and readable network fallbacks.

@@ -187,3 +187,7 @@
 ## v1.2.9
 
 - Hardened Git repository polling with strict actions, URL policy handling, scheduler fallback, duplicate task detection, rollback on scheduler failure, cancellation accounting, and audited checks.
+
+## v1.3.0
+
+- Hardened weather lookup with bounded city input, dependency-safe error handling, not-found auditing, weather-code output, and renderer-compatible text fallback.

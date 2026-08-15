@@ -605,4 +605,11 @@ test('git repository polling validates actions, scheduler fallback and rollback'
   assert.match(await dispatchFeature(manifest, event, ['\u6dfb\u52a0', 'https://github.com/example/other'], unavailable), /\u8c03\u5ea6\u670d\u52a1\u4e0d\u53ef\u7528/)
   assert.match(await dispatchFeature(manifest, event, ['\u6dfb\u52a0', 'http://127.0.0.1/repo'], runtime), /\u4e0d\u5b89\u5168/)
 })
+test('weather lookup bounds city input and dependency failures', async () => {
+  const manifest = featureManifests.find(item => item.id === '26')
+  const runtime = runtimeWithState()
+  const event = { botId: 'bot', groupId: 'g1', userId: 'u1', role: 'member', isMaster: false }
+  assert.match(await dispatchFeature(manifest, event, ['a'.repeat(65)], runtime), /\u0023\u4e91\u9526/)
+  assert.match(await dispatchFeature(manifest, event, ['\u5317\u4eac'], runtime), /\u5929\u6c14\u670d\u52a1\u4e0d\u53ef\u7528|\u672a\u627e\u5230\u57ce\u5e02|[\u6e29\u6e7f]\u5ea6/)
+})
 
