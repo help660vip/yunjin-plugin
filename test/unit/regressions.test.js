@@ -706,3 +706,20 @@ test('todo validates text, ids, completion and user scope', async () => {
   const invalid = await dispatchFeature(manifest, event, ['done', 'bad id'], runtime);
   assert.equal(invalid.length > 0, true);
 });
+
+test('clock validates timezone input and config fallback', async () => {
+  const runtime = runtimeWithState();
+  runtime.core.clock.timeZone = 'UTC';
+  const manifest = featureManifests.find((item) => item.id === '35');
+  const event = { botId: 'b', groupId: 'g', userId: 'u' };
+  const current = await dispatchFeature(manifest, event, [], runtime);
+  assert.equal(current.includes('1700000000000'), true);
+  runtime.core.clock.format = (value, options) => {
+    if (options.timeZone === 'Bad/Zone') throw new Error('invalid timezone');
+    return new Date(value).toISOString();
+  };
+  const invalid = await dispatchFeature(manifest, event, ['Bad/Zone'], runtime);
+  assert.equal(invalid.length > 0, true);
+  const oversized = await dispatchFeature(manifest, event, ['x'.repeat(65)], runtime);
+  assert.equal(oversized.length > 0, true);
+});
