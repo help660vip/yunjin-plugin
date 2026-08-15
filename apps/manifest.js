@@ -47,7 +47,7 @@ const raw = [
  ['46','essence-message','community','essence','\u7cbe\u534e','admin'],
  ['47','group-heat','community','heat','\u7fa4\u6d3b\u8dc3','admin'],
  ['48','group-historian','community','history','\u7fa4\u5386\u53f2','admin'],
- ['49','lottery-signup','community','signup','\u62a5\u540d','admin'],
+ ['49','lottery-signup','community','signup','\u62a5\u540d','user'],
  ['50','daily-task','community','task','\u65e5\u4efb\u52a1','user']
 ];
 

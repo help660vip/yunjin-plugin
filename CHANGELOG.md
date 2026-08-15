@@ -1,3 +1,11 @@
+## 1.0.4 - 2026-08-15
+
+- Runtime commands now dispatch through the concrete 50-feature handler set.
+- Fixed scheduler retry scheduling, attempt limits, and interrupted-task recovery.
+- Hardened configuration scope aliases, state sanitization, and Yunzai OP/current-scope permissions.
+- Enabled group members to join signup events while keeping event management admin-only.
+- Repaired generated service failure messages and health checks; added regression coverage.
+
 # Changelog
 
 ## 1.0.3 - 2026-08-15
