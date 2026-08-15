@@ -203,3 +203,7 @@
 ## v1.3.3
 
 - Hardened QR generation with bounded content, control-character rejection, safe parameter encoding, audit coverage, and renderer text fallback.
+
+## v1.3.4
+
+- Hardened QR rendering with bounded content, control-character rejection, shared QR URL handling, audit coverage, and text fallback when image rendering is unavailable.

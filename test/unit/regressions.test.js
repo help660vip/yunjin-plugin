@@ -639,4 +639,12 @@ test('qr generation validates bounded content and text fallback', async () => {
   assert.match(String(result), /\u4e8c\u7ef4\u7801|qrserver|example\.com/)
   assert.match(await dispatchFeature(manifest, event, ['a'.repeat(2049)], runtime), /\u0023\u4e91\u9526|argument exceeds limit/)
 })
+test('qr render validates bounded content and renderer fallback', async () => {
+  const manifest = featureManifests.find(item => item.id === '30')
+  const runtime = runtimeWithState()
+  const event = { botId: 'bot', groupId: 'g1', userId: 'u1', role: 'member', isMaster: false }
+  const result = await dispatchFeature(manifest, event, ['render me'], runtime)
+  assert.match(String(result), /\u4e8c\u7ef4\u7801|render me|qrserver/)
+  assert.match(await dispatchFeature(manifest, event, ['a'.repeat(2049)], runtime), /\u0023\u4e91\u9526|argument exceeds limit/)
+})
 

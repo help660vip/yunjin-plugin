@@ -158,3 +158,7 @@ The persisted queue is available through `#云锦推送`. Use `#云锦推送 重
 ### v1.3.3
 
 - #云锦 QR generation now validates long text and URL input before rendering.
+
+### v1.3.4
+
+- #云锦 QR rendering now keeps a readable fallback for long or unsupported image output.
