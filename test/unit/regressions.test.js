@@ -681,3 +681,28 @@ test('exchange rate validates bounded input and dependency fallback', async () =
   const fallback = await handle33(manifest, event, ['10', 'CNY', 'USD'], runtime);
   assert.equal(fallback.startsWith(String.fromCodePoint(27719, 29575)), true);
 });
+
+
+test('todo validates text, ids, completion and user scope', async () => {
+  const runtime = runtimeWithState();
+  const manifest = featureManifests.find((item) => item.id === '34');
+  const event = { botId: 'b', groupId: 'g', userId: 'u' };
+  const empty = await dispatchFeature(manifest, event, ['add'], runtime);
+  assert.equal(typeof empty, 'string');
+  assert.equal(empty.length > 0, true);
+  const oversized = await dispatchFeature(manifest, event, ['add', 'x'.repeat(501)], runtime);
+  assert.equal(oversized.length > 0, true);
+  const added = await dispatchFeature(manifest, event, ['add', 'buy', 'milk'], runtime);
+  const itemId = added.split(String.fromCodePoint(65306)).pop().trim();
+  assert.equal(/^[0-9a-f-]{36}$/iu.test(itemId), true);
+  const listed = await dispatchFeature(manifest, event, [], runtime);
+  assert.equal(listed.includes('buy milk'), true);
+  const completed = await dispatchFeature(manifest, event, ['done', itemId], runtime);
+  assert.equal(completed.includes(itemId), true);
+  const repeated = await dispatchFeature(manifest, event, ['done', itemId], runtime);
+  assert.equal(repeated.includes(itemId), true);
+  const other = await dispatchFeature(manifest, { ...event, userId: 'other' }, [], runtime);
+  assert.equal(other.includes('buy milk'), false);
+  const invalid = await dispatchFeature(manifest, event, ['done', 'bad id'], runtime);
+  assert.equal(invalid.length > 0, true);
+});
